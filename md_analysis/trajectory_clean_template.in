@@ -1,0 +1,17 @@
+# Template CPPTRAJ script to clean up trajectories and prep them for KIF.
+# Customizable params are "SYSTEM" and "OUT_PATH"
+# Aim to have maybe 5000 to 10,0000 frames per system to analyse would be reasonable.
+# You can control that via the last number in the trajin commands.
+
+parm SYSTEM_apo.prmtop
+trajin run_1/prod_md1.nc 1 last 1
+trajin run_2/prod_md1.nc 1 last 1
+trajin run_3/prod_md1.nc 1 last 1
+trajin run_4/prod_md1.nc 1 last 1
+trajin run_5/prod_md1.nc 1 last 1
+strip :WAT,Na+,Cl- outprefix OUT_PATH/Trajectories/Stripped
+autoimage
+trajout OUT_PATH/SYSTEM_apo_all_runs.nc
+run
+clear all
+exit

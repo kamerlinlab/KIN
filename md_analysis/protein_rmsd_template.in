@@ -1,0 +1,17 @@
+# Run a simple CA rmsd calc on all trajectories just to confirm...
+# no crazy conformational changes occured during the simulations.
+# Use the output from trajectory_clean for this.
+
+parm [ADD_FILE_PATH]/Stripped.System_apo.prmtop
+trajin [ADD_FILE_PATH]/SYSTEM_apo_all_runs.nc
+
+# load pdb of xray structure.
+reference /System_apo_postleap.pdb [xrayref]
+
+# Now RMS fit to xray structure.
+rms ref [xrayref] @CA
+# Now perform actual measurement (so use nofit).
+rms nofit rms @CA ref [xrayref] out Analysis/RMSDs/SYSTEM_apo_ca_rmsd.dat
+run
+clear all
+exit
