@@ -127,3 +127,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# pdb files generated
+protein_prep/crystal_structure_selection/pdb_files/*
+
