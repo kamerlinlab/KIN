@@ -5,12 +5,14 @@ and access to a single node, just to see how long it takes and the others can be
 """
 from key_interactions_finder import contact_identification
 
+TOPOLOGY_FILE = "PROC_PATH/Trajectories/sys_SYSTEM/SYSTEM_apo.prmtop"
+TRAJECTORY_FILE = "PROC_PATH/Trajectories/sys_SYSTEM/SYSTEM_apo_all_runs.nc"
 
 # Version 1. We could try this first Dariia, may run out of memory though.
 contact_identification.calculate_contacts(
     parm_file=TOPOLOGY_FILE,
     traj_file=TRAJECTORY_FILE,
-    out_file=OUT_FILE, # .csv
+    out_file="SYSTEM_contacts.csv", # .csv
     report_timings=True  # optional
 )
 
@@ -28,13 +30,13 @@ contact_identification.calculate_contacts(
 # Block3 = first_res=201, last_res=300
 # Block4 = first_res=301 # auto calculated to be last residue in system.
 
-contact_identification.calculate_contacts(
-    parm_file=TOPOLOGY_FILE,
-    traj_file=TRAJECTORY_FILE,
-    out_file=OUT_FILE, # .csv
-    first_res=1,  # optional parameter
-    last_res=50,  # optional
-    report_timings=True  # optional
-)
+#contact_identification.calculate_contacts(
+#    parm_file=Stripped.SYSTEM_apo.prmtop,
+#    traj_file=SYSTEM_apo_all_runs.nc,
+#    out_file=SYSTEM_contacts.csv, # .csv
+#    first_res=1,  # optional parameter
+#    last_res=50,  # optional
+#    report_timings=True  # optional
+#)
 
 
