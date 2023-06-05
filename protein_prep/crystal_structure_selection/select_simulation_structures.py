@@ -22,13 +22,13 @@ os.makedirs(OUTPUT_FOLDER, exist_ok=True)
 
 # download table.
 all_blactam_df = pd.read_html(TABLE_URL)[1]
-
-class_A_blactam = all_blactam_df[all_blactam_df["Amblerclass"] == "A"]
+print(all_blactam_df.columns)
+class_A_blactam = all_blactam_df[all_blactam_df["Ambler class"] == "A"]
 print(f" Number of Class A structures found: {len(class_A_blactam)}")
 
 # remove non-needed columns
-drop_list = ["Amblerclass", "Releasedate", "PubMedID", "DOI", "PDB", "Mutations",
-             "Ligands", "Spacegroup", "Unit cell parameters", "Zvalue"]
+drop_list = ["Ambler class", "Release date", "PubMed ID", "DOI", "PDB", "Mutations",
+             "Ligands", "Space group", "Unit cell parameters", "Z value"]
 class_A_blactam = class_A_blactam.drop(drop_list, axis=1)
 
 # Proteins without uniprot information are synthetic or from ancestral reconstruction.
@@ -36,13 +36,13 @@ class_A_blactam = class_A_blactam.drop(drop_list, axis=1)
 class_A_blactam = class_A_blactam.dropna()
 
 # There are also a few chimeric structures, which should not be included.
-remove_mask = class_A_blactam["PDBcode"].isin(
+remove_mask = class_A_blactam["PDB code"].isin(
     ["4ID4", "4QY5", "4QY6", "4R4R", "4R4S", ]
 )
 class_A_blactam = class_A_blactam[~remove_mask]
 
 print(f"Number of Natural class A structures found: {len(class_A_blactam)}")
-num_unique = len(class_A_blactam["Proteinname"].unique())
+num_unique = len(class_A_blactam["Protein name"].unique())
 print(f" Number of UNIQUE, Natural class A structures found: {num_unique}")
 
 
@@ -50,12 +50,12 @@ print(f" Number of UNIQUE, Natural class A structures found: {num_unique}")
 # Preorder each unique enzyme to have lowest resolution structure
 # first for easy filtering with drop duplicates.
 class_A_blactam = class_A_blactam.sort_values(
-    ["Proteinname", "Resolution(Å)"],
+    ["Protein name", "Resolution (Å)"],
     ascending=[True, True]
 )
 
 structs_to_sim = class_A_blactam.drop_duplicates(
-    subset=["Proteinname"],
+    subset=["Protein name"],
     keep="first"
 )
 
@@ -66,7 +66,7 @@ structs_to_sim.to_csv(file_path, index=False)
 
 # Part 2: Download from the PDB
 pdbs_to_get = dict(
-    zip(structs_to_sim["PDBcode"], structs_to_sim["Proteinname"]))
+    zip(structs_to_sim["PDB code"], structs_to_sim["Protein name"]))
 print(f"Number of pdbs to download:{len(pdbs_to_get)}")
 
 
