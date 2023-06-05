@@ -2,7 +2,7 @@ The final output of the analysis is structured as a disctionary where
 each key is a number of a residue based on the global (msa) indexing and
 each value is a list of N integeres, where N is a number of sturctures
 analyzed and each integer represents a number of interactions formed by
-that structure. 
+the specified residue in each structure. 
 This information is saved in int_in_all_struct.pickle and int_in_all_struct.csv
 
 Additionally there are .csv files for each structre that contain
