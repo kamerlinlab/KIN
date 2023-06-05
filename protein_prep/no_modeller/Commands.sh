@@ -37,14 +37,14 @@ done
 rm all_sequences.txt
 rm all_sequences.seq
 touch all_sequences.seq
-for i in *.pdb
-do 
-	pdb_name=`echo $i| awk -F. '{print $1}'`
-	cp $BASE/get_sequence.py .
-	sed -i "s/NAME/${pdb_name}/g" get_sequence.py
-	python get_sequence.py
-	cat ${pdb_name}.seq >> all_sequences.seq
-done
+#for i in *.pdb
+#do 
+#	pdb_name=`echo $i| awk -F. '{print $1}'`
+#	cp $BASE/get_sequence.py .
+#	sed -i "s/NAME/${pdb_name}/g" get_sequence.py
+#	python get_sequence.py
+#	cat ${pdb_name}.seq >> all_sequences.seq
+#done
 cp $BASE/align_example.py .
 python align_example.py
 	#find line number where Atom listing starts 

@@ -71,7 +71,7 @@ def calculate_contacts(parm_file: str, traj_file: str, msa_sequence: str,
 	print("done making contact scores, moved on to indexing")
 
 
-	msa_contact_scores = _indexing_pdb_to_msa(msa_sequence, all_contact_scores)
+	msa_contact_scores = indexing_pdb_to_msa(msa_sequence, all_contact_scores)
 
 	#checking the msa to pdb inde conversion
 	index_contact_scores = {} 
@@ -82,7 +82,7 @@ def calculate_contacts(parm_file: str, traj_file: str, msa_sequence: str,
 			res_pdb_id_2, res_pdb_name_2 = key_2.split("_")
 			index_contact_scores[int(res_pdb_id_1)][int(res_pdb_id_2)]=value_2
 		
-	pdb_contact_scores = _indexing_msa_to_pdb(msa_sequence, msa_contact_scores)
+	pdb_contact_scores = indexing_msa_to_pdb(msa_sequence, msa_contact_scores)
 
 	if pdb_contact_scores == index_contact_scores:
 		print("dictionaries are the same")
@@ -101,7 +101,7 @@ def calculate_contacts(parm_file: str, traj_file: str, msa_sequence: str,
 
 
 	
-def _indexing_pdb_to_msa(msa_sequence: list[str],
+def indexing_pdb_to_msa(msa_sequence: list[str],
 		all_contact_scores: dict[str, dict[str,float]]) -> dict[float, float]:
 	
 	counter=0.0
@@ -128,7 +128,7 @@ def _indexing_pdb_to_msa(msa_sequence: list[str],
 			
 	return msa_contact_scores
 
-def _indexing_msa_to_pdb(msa_sequence: list[str],
+def indexing_msa_to_pdb(msa_sequence: list[str],
 		msa_contact_scores: dict[int, dict[int,float]]) -> dict[float, float]:
 	
 	counter=0
