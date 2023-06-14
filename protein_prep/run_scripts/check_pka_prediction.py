@@ -4,10 +4,10 @@ Any non standard values are printed to the console.
 """
 from typing import List
 import re
-
+import json
 # Constant to be updated.
 PKA_FILE = "NAME.pka"
-
+OUT_FILE = "propka_check.log"
 # histidine is not acidic, but same check performed (looking for high pka values).
 ACIDIC_RESIDUES = ("ASP", "GLU", "C-", "HIS")
 BASIC_RESIDUES = ("ARG", "LYS", "TYR", "N+")
@@ -57,9 +57,18 @@ def main():
     summary_section = parse_pka_file(file_path=PKA_FILE)
     non_standard_predictions = find_non_standard_predictions(summary_section)
     if non_standard_predictions:
-        print(f"Non standard pka predictions for file: {PKA_FILE}")
-        print(non_standard_predictions)
-        print("\n")
+        with open(OUT_FILE, 'a') as file:
+            file.write("Non standard pka predictions for file: {PKA_FILE}" + '\n')
+            file.write(str(non_standard_predictions) + '\n')
+        my_tuple =(PKA_FILE, non_standard_predictions) 
+        my_tuple_str=json.dumps(my_tuple)
+        #tuple_str=$(IFS='|'; echo "${my_tuple[*]}")
+        #print(PKA_FILE)
+
+        print(my_tuple_str)
+        #print(f"Non standard pka predictions for file: {PKA_FILE}")
+        #print(non_standard_predictions)
+        #print("\n")
 
 if __name__ == "__main__":
     main()
