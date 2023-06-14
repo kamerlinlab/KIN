@@ -19,6 +19,8 @@ sequence_length = []
 
 for structure in names:
     key = f"{structure}"  # TODO - what does this line do?
+    # it just takes a name of the "structure" dictionary and assigns it to the key of the 
+    #outermost dictionary, such that the dictionary contains the name of each protein
     with open(f"contacts/{structure}_msa_ind_contacts.pickle", "rb") as file:
         contacts = pickle.load(file)
         if len(contacts) > max_len_sequence[1]:
@@ -106,6 +108,8 @@ if sd_calc:
     residue_std_devs = dict(sorted(residue_std_devs.items(), key=lambda item: item[0]))
 else:
     sys.exit(0)
+
+
 # MSA values
 data = np.genfromtxt("pos_ranking_nostar.dat", names=True, dtype=None, encoding=None)
 scores = data["pos_scr"]

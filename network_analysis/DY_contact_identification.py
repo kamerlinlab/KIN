@@ -17,8 +17,7 @@ HYDROPHOBIC_RESIDUES = ("ALA", "VAL", "LEU", "ILE", "PRO", "PHE", "Cys")
 def calculate_contacts(
     parm_file: str,
     traj_file: str,
-    msa_sequence: str,
-    short_msa_sequence: str,  # TODO - this is not currently used.
+    msa_sequence: list[str],
     out_file: str,
     first_res: Optional[int] = None,
     last_res: Optional[int] = None,
@@ -53,7 +52,8 @@ def calculate_contacts(
             res_delta = abs(
                 res1 - res2
             )  # TODO - use res_delta to filter out false contacts
-
+            if res_delta <= 2:
+                continue
             res2_sele = "not name H* and resid " + str(res2)
             res2_atoms = universe.select_atoms(res2_sele)
             contact_scores = []
@@ -120,7 +120,6 @@ def indexing_pdb_to_msa(
             counter += 1
             index_pdb_msa[int(counter)] = i + 1
         else:
-            missing_msa_indx = i
             missing_indicies.append(i + 1)
     print("Missing residues:", missing_indicies)
     for key_1, value_1 in all_contact_scores.items():

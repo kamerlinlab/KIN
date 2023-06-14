@@ -1,15 +1,18 @@
 """
 These would be better submitted as jobs, for the first one give maybe 24 hours
-and access to a single node, just to see how long it takes and the others can be adjusted from there.
+and access to a single node, just to see how long it takes and the others
+can be adjusted from there.
 
 """
 # from key_interactions_finder import contact_identification
+from tkinter import W
 import DY_contact_identification as contact_identification
 import numpy as np
 
-TOPOLOGY_FILE = r"/storage/home/hhive1/dyehorova3/data/tools/Md_processing/Trajectories/sys_SEQ_NAME/no_int_type/SEQ_NAME_apo.prmtop"
 
+TOPOLOGY_FILE = r"/storage/home/hhive1/dyehorova3/data/tools/Md_processing/Trajectories/sys_SEQ_NAME/no_int_type/SEQ_NAME_apo.prmtop"
 TRAJECTORY_FILE = r"/storage/home/hhive1/dyehorova3/data/tools/Md_processing/Trajectories/sys_SEQ_NAME/no_int_type/first_frame.nc"
+
 
 SEQUENCE_FILE = "SEQ_NAME_apo_postleap.seq"
 MSA_SEQUENCES_FILE = "pos_ranking_nostar.dat"
@@ -53,7 +56,6 @@ contact_identification.calculate_contacts(
     parm_file=TOPOLOGY_FILE,
     traj_file=TRAJECTORY_FILE,
     msa_sequence=sequence,
-    short_msa_sequence=short_sequence,
     out_file="SEQ_NAME_msa_ind_contacts.pickle",
     report_timings=True,  # optional
 )
