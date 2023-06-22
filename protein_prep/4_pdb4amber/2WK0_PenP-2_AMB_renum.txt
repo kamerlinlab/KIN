@@ -198,7 +198,7 @@ GLU A   197    GLU   197
 VAL A   198    VAL   198
 ALA A   199    ALA   199
 ASP A   200    ASP   200
-LYS A   201    LYS   201
+LYN A   201    LYN   201
 THR A   202    THR   202
 GLY A   203    GLY   203
 ALA A   204    ALA   204

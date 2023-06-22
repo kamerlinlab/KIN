@@ -20,16 +20,11 @@ for res_1 in my_tuple[1]:
     res_name = res_1[0]
     res_indx = res_1[1]
     FIXES_REQUIRED.append((structure_name, str(res_name), str(res_indx))) 
-#FIXES_REQUIRED = [
-#    ("1BSG_Sabla_FH.pdb", "ASP", "246"),
-#    ("3BLM_blaZ_FH.pdb", "ASP", "246"),
-#]
 
 
 # Non-adjustable parameters below.
 # possible protontation state changes.
-ALLOWED_CHANGES = {"ASP": "ASH", "GLU": "GLH", "HIS": "HIP"}
-
+ALLOWED_CHANGES = {"ASP": "ASH", "GLU": "GLH", "HIS": "HIP", "LYS": "LYN"}
 def edit_pdb_file(pdb_file:str, target_res_name:str, target_res_numb: str) -> List[list]:
     """Find the residue name to change, edit it and then store as a list to write out."""
     exchange_made = False # prints as warning if no exchange found...

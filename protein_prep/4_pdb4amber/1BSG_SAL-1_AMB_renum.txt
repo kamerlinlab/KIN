@@ -210,7 +210,7 @@ THR A   209    THR   209
 LEU A   210    LEU   210
 GLY A   211    GLY   211
 ASP A   212    ASP   212
-LYS A   213    LYS   213
+LYN A   213    LYN   213
 THR A   214    THR   214
 GLY A   215    GLY   215
 ALA A   216    ALA   216

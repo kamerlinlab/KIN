@@ -1,0 +1,11 @@
+Initial strucutres are already cleaned
+File with strucutres is here
+1BSG_SAL-1
+["1BSG_SAL-1_FH.pka", [["ASP", "224", "11.00"], ["LYS", "213", "5.97"]]]
+1BSG_SAL-1_FH
+1BUE_NmcA
+["1BUE_NmcA_FH.pka", [["ASP", "221", "10.66"]]]
+1BUE_NmcA_FH
+1DY6_SME-1
+["1DY6_SME-1_FH.pka", [["ASP", "223", "10.93"]]]
+1DY6_SME-1_FH

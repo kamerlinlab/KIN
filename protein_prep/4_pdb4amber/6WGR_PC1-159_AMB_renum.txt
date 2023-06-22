@@ -199,7 +199,7 @@ LYS A   198    LYS   198
 VAL A   199    VAL   199
 ALA A   200    ALA   200
 ASP A   201    ASP   201
-LYS A   202    LYS   202
+LYN A   202    LYN   202
 SER A   203    SER   203
 GLY A   204    GLY   204
 GLN A   205    GLN   205

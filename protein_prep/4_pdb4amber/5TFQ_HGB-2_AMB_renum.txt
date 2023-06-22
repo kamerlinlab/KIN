@@ -211,7 +211,7 @@ ILE A   210    ILE   210
 VAL A   211    VAL   211
 GLY A   212    GLY   212
 HIS A   213    HIS   213
-LYS A   214    LYS   214
+LYN A   214    LYN   214
 THR A   215    THR   215
 GLY A   216    GLY   216
 SER A   217    SER   217

@@ -45,7 +45,7 @@ ALA A    44    ALA    44
 SER A    45    SER    45
 THR A    46    THR    46
 VAL A    47    VAL    47
-LYS A    48    LYS    48
+LYN A    48    LYN    48
 ILE A    49    ILE    49
 PRO A    50    PRO    50
 LEU A    51    LEU    51

@@ -206,7 +206,7 @@ THR A   205    THR   205
 VAL A   206    VAL   206
 GLY A   207    GLY   207
 ASP A   208    ASP   208
-LYS A   209    LYS   209
+LYN A   209    LYN   209
 THR A   210    THR   210
 GLY A   211    GLY   211
 THR A   212    THR   212

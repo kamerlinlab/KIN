@@ -209,7 +209,7 @@ VAL A   208    VAL   208
 VAL A   209    VAL   209
 ALA A   210    ALA   210
 HIS A   211    HIS   211
-LYS A   212    LYS   212
+LYN A   212    LYN   212
 THR A   213    THR   213
 GLY A   214    GLY   214
 THR A   215    THR   215
