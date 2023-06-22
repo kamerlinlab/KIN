@@ -70,7 +70,7 @@ if [[ ! -d $BASE_PREP/0_xray_structures && ! -d $BASE_PREP/1_cleaned_protein ]];
                 mv fasta.B99990001.pdb "${pdb_name}"_new.pdb    
         done
         fi      
-
+#
 echo "Initial strucutres are already cleaned"
 if test $BASE/file_list.txt; then echo "File with strucutres is here"; fi
 #rm $BASE_PREP/3_propka/propka_check.log
@@ -97,11 +97,10 @@ do
         echo "$problematic_res"
 
         if [ "$problematic_res" != None ]; then
-                python update_protonation_states.py "$problematic_res"
-        fi
+                python $BASE_PREP/3_propka/update_protonation_states.py "$problematic_res"
+	fi
 
 #Should manually inspect propka_check.log for non-standard pka predictions
-
 ## Step 4 - 3_propka 4_pdb4amber 
         cd $BASE_PREP/4_pdb4amber || exit
         pdb4amber -i $BASE_PREP/2_reduce/"${pdb_name}"_FH.pdb -o "${pdb_name}"_AMB.pdb >> amber.log
@@ -111,7 +110,7 @@ do
         cd $BASE_PREP/5_tleap || exit
         cp $BASE_PREP/4_pdb4amber/"${pdb_name}"_AMB.pdb ./.
         mv "${pdb_name}"_AMB.pdb "${pdb_name}"_apo.pdb # rename output. 
-        cp $BASE/tleap.in .
+        cp $BASE_PREP/run_scripts/tleap.in .
 	sed -i "s/NAME/${pdb_name}/g" tleap.in
 	tleap -f tleap.in > tleap.out
 done

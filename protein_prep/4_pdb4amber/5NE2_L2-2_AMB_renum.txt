@@ -222,7 +222,7 @@ ASP A   221    ASP   221
 ALA A   222    ALA   222
 ARG A   223    ARG   223
 ASN A   224    ASN   224
-ASP A   225    ASP   225
+ASH A   225    ASH   225
 ILE A   226    ILE   226
 ALA A   227    ALA   227
 VAL A   228    VAL   228

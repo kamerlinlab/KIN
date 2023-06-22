@@ -161,7 +161,7 @@ SER A   160    SER   160
 MET A   161    MET   161
 GLY A   162    GLY   162
 ARG A   163    ARG   163
-ASP A   164    ASP   164
+ASH A   164    ASH   164
 LEU A   165    LEU   165
 ARG A   166    ARG   166
 ALA A   167    ALA   167
@@ -218,7 +218,7 @@ GLY A   217    GLY   217
 ALA A   218    ALA   218
 GLY A   219    GLY   219
 ASN A   220    ASN   220
-ASP A   221    ASP   221
+ASH A   221    ASH   221
 ILE A   222    ILE   222
 ALA A   223    ALA   223
 VAL A   224    VAL   224

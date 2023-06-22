@@ -158,7 +158,7 @@ GLN A   157    GLN   157
 LEU A   158    LEU   158
 ALA A   159    ALA   159
 THR A   160    THR   160
-ASP A   161    ASP   161
+ASH A   161    ASH   161
 LEU A   162    LEU   162
 GLN A   163    GLN   163
 ALA A   164    ALA   164
@@ -214,7 +214,7 @@ GLY A   213    GLY   213
 ARG A   214    ARG   214
 ARG A   215    ARG   215
 ASN A   216    ASN   216
-ASP A   217    ASP   217
+ASH A   217    ASH   217
 ILE A   218    ILE   218
 ALA A   219    ALA   219
 ILE A   220    ILE   220

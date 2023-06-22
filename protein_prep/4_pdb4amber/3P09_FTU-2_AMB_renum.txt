@@ -159,7 +159,7 @@ ALA A   158    ALA   158
 ILE A   159    ILE   159
 THR A   160    THR   160
 LYS A   161    LYS   161
-ASP A   162    ASP   162
+ASH A   162    ASH   162
 ILE A   163    ILE   163
 TYR A   164    TYR   164
 LYS A   165    LYS   165
@@ -216,7 +216,7 @@ ALA A   215    ALA   215
 ALA A   216    ALA   216
 THR A   217    THR   217
 ASN A   218    ASN   218
-ASP A   219    ASP   219
+ASH A   219    ASH   219
 VAL A   220    VAL   220
 ALA A   221    ALA   221
 ILE A   222    ILE   222

@@ -211,7 +211,7 @@ SER A   210    SER   210
 GLY A   211    GLY   211
 ALA A   212    ALA   212
 GLY A   213    GLY   213
-GLU A   214    GLU   214
+GLH A   214    GLH   214
 ARG A   215    ARG   215
 GLY A   216    GLY   216
 SER A   217    SER   217

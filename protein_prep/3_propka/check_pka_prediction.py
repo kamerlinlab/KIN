@@ -6,7 +6,7 @@ from typing import List
 import re
 import json
 # Constant to be updated.
-PKA_FILE = "2CC1_MFO-1_FH.pka"
+PKA_FILE = "7QLP_TEM-171_FH.pka"
 OUT_FILE = "propka_check.log"
 # histidine is not acidic, but same check performed (looking for high pka values).
 ACIDIC_RESIDUES = ("ASP", "GLU", "C-", "HIS")

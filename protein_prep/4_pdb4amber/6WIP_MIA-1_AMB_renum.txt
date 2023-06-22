@@ -204,7 +204,7 @@ TRP A   203    TRP   203
 GLN A   204    GLN   204
 VAL A   205    VAL   205
 ALA A   206    ALA   206
-ASP A   207    ASP   207
+ASH A   207    ASH   207
 LYS A   208    LYS   208
 SER A   209    SER   209
 GLY A   210    GLY   210

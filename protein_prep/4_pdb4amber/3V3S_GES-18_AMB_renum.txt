@@ -207,7 +207,7 @@ TRP A   206    TRP   206
 VAL A   207    VAL   207
 VAL A   208    VAL   208
 GLY A   209    GLY   209
-GLU A   210    GLU   210
+GLH A   210    GLH   210
 LYS A   211    LYS   211
 THR A   212    THR   212
 GLY A   213    GLY   213

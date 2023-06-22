@@ -111,7 +111,7 @@ LEU A   110    LEU   110
 LEU A   111    LEU   111
 LEU A   112    LEU   112
 LYS A   113    LYS   113
-GLU A   114    GLU   114
+GLH A   114    GLH   114
 VAL A   115    VAL   115
 GLY A   116    GLY   116
 GLY A   117    GLY   117

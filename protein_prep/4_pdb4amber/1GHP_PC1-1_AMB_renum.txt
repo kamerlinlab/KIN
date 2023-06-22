@@ -210,7 +210,7 @@ ALA A   209    ALA   209
 SER A   210    SER   210
 ARG A   211    ARG   211
 ASN A   212    ASN   212
-ASP A   213    ASP   213
+ASH A   213    ASH   213
 VAL A   214    VAL   214
 ALA A   215    ALA   215
 PHE A   216    PHE   216

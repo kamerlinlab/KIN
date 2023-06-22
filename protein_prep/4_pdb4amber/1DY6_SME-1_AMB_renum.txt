@@ -220,7 +220,7 @@ GLY A   219    GLY   219
 THR A   220    THR   220
 ALA A   221    ALA   221
 ASN A   222    ASN   222
-ASP A   223    ASP   223
+ASH A   223    ASH   223
 TYR A   224    TYR   224
 ALA A   225    ALA   225
 VAL A   226    VAL   226

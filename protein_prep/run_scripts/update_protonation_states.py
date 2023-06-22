@@ -13,7 +13,8 @@ FIXES_REQUIRED = []
 
 problematic_res=(sys.argv[1])
 my_tuple = json.loads(problematic_res)
-structure_name = my_tuple[0]
+structure_name = my_tuple[0].split(".")[0]
+print(structure_name)
 
 for res_1 in my_tuple[1]:
     res_name = res_1[0]
@@ -59,7 +60,7 @@ def edit_pdb_file(pdb_file:str, target_res_name:str, target_res_numb: str) -> Li
 
 def main():
     for fix_item in FIXES_REQUIRED:
-        file_path = r"3_propka/" + fix_item[0]
+        file_path = "../2_reduce/"+fix_item[0]+".pdb"
         new_pdb_file = edit_pdb_file(pdb_file=file_path,
                                      target_res_name=fix_item[1],
                                      target_res_numb=fix_item[2])

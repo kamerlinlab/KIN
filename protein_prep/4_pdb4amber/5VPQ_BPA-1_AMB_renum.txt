@@ -171,7 +171,7 @@ ALA A   170    ALA   170
 MET A   171    MET   171
 LEU A   172    LEU   172
 LEU A   173    LEU   173
-ASP A   174    ASP   174
+ASH A   174    ASH   174
 VAL A   175    VAL   175
 GLN A   176    GLN   176
 LYS A   177    LYS   177
@@ -229,7 +229,7 @@ GLY A   228    GLY   228
 THR A   229    THR   229
 ALA A   230    ALA   230
 ASN A   231    ASN   231
-ASP A   232    ASP   232
+ASH A   232    ASH   232
 VAL A   233    VAL   233
 ALA A   234    ALA   234
 VAL A   235    VAL   235

@@ -214,7 +214,7 @@ GLY A   213    GLY   213
 THR A   214    THR   214
 THR A   215    THR   215
 ASN A   216    ASN   216
-ASP A   217    ASP   217
+ASH A   217    ASH   217
 ILE A   218    ILE   218
 ALA A   219    ALA   219
 VAL A   220    VAL   220

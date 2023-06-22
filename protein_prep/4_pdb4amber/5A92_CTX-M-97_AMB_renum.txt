@@ -135,7 +135,7 @@ LEU A   134    LEU   134
 ASP A   135    ASP   135
 ARG A   136    ARG   136
 THR A   137    THR   137
-GLU A   138    GLU   138
+GLH A   138    GLH   138
 PRO A   139    PRO   139
 THR A   140    THR   140
 LEU A   141    LEU   141
@@ -214,7 +214,7 @@ GLY A   213    GLY   213
 THR A   214    THR   214
 THR A   215    THR   215
 ASN A   216    ASN   216
-ASP A   217    ASP   217
+ASH A   217    ASH   217
 ILE A   218    ILE   218
 ALA A   219    ALA   219
 VAL A   220    VAL   220

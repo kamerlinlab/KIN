@@ -212,10 +212,10 @@ SER A   211    SER   211
 VAL A   212    VAL   212
 ASP A   213    ASP   213
 ARG A   214    ARG   214
-GLU A   215    GLU   215
+GLH A   215    GLH   215
 THR A   216    THR   216
 ASN A   217    ASN   217
-ASP A   218    ASP   218
+ASH A   218    ASH   218
 TYR A   219    TYR   219
 ALA A   220    ALA   220
 LEU A   221    LEU   221

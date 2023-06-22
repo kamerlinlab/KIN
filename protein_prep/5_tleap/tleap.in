@@ -1,0 +1,17 @@
+source leaprc.protein.ff14SB 
+source leaprc.water.tip3p
+
+7QLP_TEM-171_apo = loadPDB 7QLP_TEM-171_apo.pdb 
+
+# solvate box, either octahedral or cube - whichever makes less waters. 
+#solvateOct 7QLP_TEM-171_apo OPCBOX 12.0 # TIP3PBOX 12.0 [old]
+solvateBox 7QLP_TEM-171_apo TIP3PBOX 12.0 # TIP3PBOX 12.0 [old]
+
+# neutralise.
+addionsrand 7QLP_TEM-171_apo Na+ 0 # add positive counterions if overall charge negative (to make neutral)
+addionsrand 7QLP_TEM-171_apo Cl- 0 # add negative counterions if overall charge positive (to make neutral)
+
+savepdb 7QLP_TEM-171_apo 7QLP_TEM-171_apo_postleap.pdb # Save a PDB of tleap processed structure.
+saveamberparm 7QLP_TEM-171_apo 7QLP_TEM-171_apo.prmtop 7QLP_TEM-171_apo.inpcrd # Save amber params. 
+#check 7QLP_TEM-171_apo # Optional test to look for clashes in structure etc... 
+quit 
