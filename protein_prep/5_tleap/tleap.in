@@ -4,8 +4,8 @@ source leaprc.water.tip3p
 7QLP_TEM-171_apo = loadPDB 7QLP_TEM-171_apo.pdb 
 
 # solvate box, either octahedral or cube - whichever makes less waters. 
-solvateOct 7QLP_TEM-171_apo OPCBOX 12.0 # TIP3PBOX 12.0 [old]
-#solvateBox 7QLP_TEM-171_apo TIP3PBOX 12.0 # TIP3PBOX 12.0 [old]
+#solvateOct 7QLP_TEM-171_apo OPCBOX 12.0 # TIP3PBOX 12.0 [old]
+solvateBox 7QLP_TEM-171_apo TIP3PBOX 12.0 # TIP3PBOX 12.0 [old]
 
 # neutralise.
 addionsrand 7QLP_TEM-171_apo Na+ 0 # add positive counterions if overall charge negative (to make neutral)
