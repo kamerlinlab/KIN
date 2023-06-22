@@ -112,7 +112,7 @@ do
         mv "${pdb_name}"_AMB.pdb "${pdb_name}"_apo.pdb # rename output. 
         cp $BASE_PREP/run_scripts/tleap.in .
 	sed -i "s/NAME/${pdb_name}/g" tleap.in
-	tleap -f tleap.in > tleap.out
+	tleap -f tleap.in > tleap_${pdb_name}.out
 done
 
 # Inside the tleap.in file, 1 adjustable command. 
