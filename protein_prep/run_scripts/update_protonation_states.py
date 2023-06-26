@@ -12,16 +12,18 @@ import json
 FIXES_REQUIRED = []
 
 problematic_res=(sys.argv[1])
+if problematic_res == "":
+    print("No pka corrections needed")
+    exit()
 my_tuple = json.loads(problematic_res)
 structure_name = my_tuple[0].split(".")[0]
-print(structure_name)
-if structure_name=="4EWF_SPH-1_FH":
-    res_1[1]=209
-
-
+	
 for res_1 in my_tuple[1]:
     res_name = res_1[0]
     res_indx = res_1[1]
+    if structure_name=="4EWF_SPH-1_FH" and res_name=="LYS":
+        print("replacing", res_name, res_indx, "to 209")
+        res_indx = 209
     print("in prot.fix file:", structure_name, res_name, res_indx) 
     FIXES_REQUIRED.append((structure_name, str(res_name), str(res_indx))) 
 	
@@ -68,6 +70,5 @@ def main():
         with open(file_path, "w") as writer:
             for line in new_pdb_file:
                 writer.write(line)
-
 if __name__ == "__main__":
     main()

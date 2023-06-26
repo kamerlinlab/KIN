@@ -121,10 +121,10 @@ in prot.fix file: 3ZNY_CTX-M-96_FH LYS 206
 4EUZ_SFC-1
 ["4EUZ_SFC-1_FH.pka", [["ASP", "225", "10.85"]]]
 4EUZ_SFC-1_FH
-in prot.fix file: 4EUZ_SFC-1_FH ASP 225
 4EWF_SPH-1
 ["4EWF_SPH-1_FH.pka", [["LYS", "48", "5.68"]]]
 4EWF_SPH-1_FH
+in prot.fix file: 4EWF_SPH-1_FH LYS 48
 4MXG_BEL-1
 ["4MXG_BEL-1_FH.pka", [["GLU", "114", "8.35"]]]
 4MXG_BEL-1_FH

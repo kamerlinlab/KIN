@@ -1,42 +1,42 @@
--I: Adding /storage/home/hhive1/dyehorova3/.conda/envs/Kif/dat/leap/prep to search path.
--I: Adding /storage/home/hhive1/dyehorova3/.conda/envs/Kif/dat/leap/lib to search path.
--I: Adding /storage/home/hhive1/dyehorova3/.conda/envs/Kif/dat/leap/parm to search path.
--I: Adding /storage/home/hhive1/dyehorova3/.conda/envs/Kif/dat/leap/cmd to search path.
+-I: Adding /storage/home/hhive1/dyehorova3/.conda/envs/AmberTools22/dat/leap/prep to search path.
+-I: Adding /storage/home/hhive1/dyehorova3/.conda/envs/AmberTools22/dat/leap/lib to search path.
+-I: Adding /storage/home/hhive1/dyehorova3/.conda/envs/AmberTools22/dat/leap/parm to search path.
+-I: Adding /storage/home/hhive1/dyehorova3/.conda/envs/AmberTools22/dat/leap/cmd to search path.
 -f: Source tleap.in.
 
 Welcome to LEaP!
 (no leaprc in search path)
 Sourcing: ./tleap.in
------ Source: /storage/home/hhive1/dyehorova3/.conda/envs/Kif/dat/leap/cmd/leaprc.protein.ff14SB
------ Source of /storage/home/hhive1/dyehorova3/.conda/envs/Kif/dat/leap/cmd/leaprc.protein.ff14SB done
+----- Source: /storage/home/hhive1/dyehorova3/.conda/envs/AmberTools22/dat/leap/cmd/leaprc.protein.ff14SB
+----- Source of /storage/home/hhive1/dyehorova3/.conda/envs/AmberTools22/dat/leap/cmd/leaprc.protein.ff14SB done
 Log file: ./leap.log
-Loading parameters: /storage/home/hhive1/dyehorova3/.conda/envs/Kif/dat/leap/parm/parm10.dat
+Loading parameters: /storage/home/hhive1/dyehorova3/.conda/envs/AmberTools22/dat/leap/parm/parm10.dat
 Reading title:
 PARM99 + frcmod.ff99SB + frcmod.parmbsc0 + OL3 for RNA
-Loading parameters: /storage/home/hhive1/dyehorova3/.conda/envs/Kif/dat/leap/parm/frcmod.ff14SB
+Loading parameters: /storage/home/hhive1/dyehorova3/.conda/envs/AmberTools22/dat/leap/parm/frcmod.ff14SB
 Reading force field modification type file (frcmod)
 Reading title:
 ff14SB protein backbone and sidechain parameters
-Loading library: /storage/home/hhive1/dyehorova3/.conda/envs/Kif/dat/leap/lib/amino12.lib
-Loading library: /storage/home/hhive1/dyehorova3/.conda/envs/Kif/dat/leap/lib/aminoct12.lib
-Loading library: /storage/home/hhive1/dyehorova3/.conda/envs/Kif/dat/leap/lib/aminont12.lib
------ Source: /storage/home/hhive1/dyehorova3/.conda/envs/Kif/dat/leap/cmd/leaprc.water.tip3p
------ Source of /storage/home/hhive1/dyehorova3/.conda/envs/Kif/dat/leap/cmd/leaprc.water.tip3p done
-Loading library: /storage/home/hhive1/dyehorova3/.conda/envs/Kif/dat/leap/lib/atomic_ions.lib
-Loading library: /storage/home/hhive1/dyehorova3/.conda/envs/Kif/dat/leap/lib/solvents.lib
-Loading parameters: /storage/home/hhive1/dyehorova3/.conda/envs/Kif/dat/leap/parm/frcmod.tip3p
+Loading library: /storage/home/hhive1/dyehorova3/.conda/envs/AmberTools22/dat/leap/lib/amino12.lib
+Loading library: /storage/home/hhive1/dyehorova3/.conda/envs/AmberTools22/dat/leap/lib/aminoct12.lib
+Loading library: /storage/home/hhive1/dyehorova3/.conda/envs/AmberTools22/dat/leap/lib/aminont12.lib
+----- Source: /storage/home/hhive1/dyehorova3/.conda/envs/AmberTools22/dat/leap/cmd/leaprc.water.tip3p
+----- Source of /storage/home/hhive1/dyehorova3/.conda/envs/AmberTools22/dat/leap/cmd/leaprc.water.tip3p done
+Loading library: /storage/home/hhive1/dyehorova3/.conda/envs/AmberTools22/dat/leap/lib/atomic_ions.lib
+Loading library: /storage/home/hhive1/dyehorova3/.conda/envs/AmberTools22/dat/leap/lib/solvents.lib
+Loading parameters: /storage/home/hhive1/dyehorova3/.conda/envs/AmberTools22/dat/leap/parm/frcmod.tip3p
 Reading force field modification type file (frcmod)
 Reading title:
 This is the additional/replacement parameter set for TIP3P water
-Loading parameters: /storage/home/hhive1/dyehorova3/.conda/envs/Kif/dat/leap/parm/frcmod.ions1lm_126_tip3p
+Loading parameters: /storage/home/hhive1/dyehorova3/.conda/envs/AmberTools22/dat/leap/parm/frcmod.ions1lm_126_tip3p
 Reading force field modification type file (frcmod)
 Reading title:
 Li/Merz ion parameters of monovalent ions for TIP3P water model (12-6 normal usage set)
-Loading parameters: /storage/home/hhive1/dyehorova3/.conda/envs/Kif/dat/leap/parm/frcmod.ionsjc_tip3p
+Loading parameters: /storage/home/hhive1/dyehorova3/.conda/envs/AmberTools22/dat/leap/parm/frcmod.ionsjc_tip3p
 Reading force field modification type file (frcmod)
 Reading title:
 Monovalent ion parameters for Ewald and TIP3P water from Joung & Cheatham JPCB (2008)
-Loading parameters: /storage/home/hhive1/dyehorova3/.conda/envs/Kif/dat/leap/parm/frcmod.ions234lm_126_tip3p
+Loading parameters: /storage/home/hhive1/dyehorova3/.conda/envs/AmberTools22/dat/leap/parm/frcmod.ions234lm_126_tip3p
 Reading force field modification type file (frcmod)
 Reading title:
 Li/Merz ion parameters of divalent to tetravalent ions for TIP3P water model (12-6 normal usage set)
@@ -51,25 +51,25 @@ Loading PDB file: ./7QLP_TEM-171_apo.pdb
   Added 19522 residues.
 7 Na+ ions required to neutralize.
 Adding 7 counter ions to "7QLP_TEM-171_apo". 19515 solvent molecules will remain.
-0: Placed Na+ in 7QLP_TEM-171_apo at (45.32, -22.92, 25.75).
-0: Placed Na+ in 7QLP_TEM-171_apo at (5.44, -14.76, 4.51).
-0: Placed Na+ in 7QLP_TEM-171_apo at (40.86, -29.60, 8.80).
-0: Placed Na+ in 7QLP_TEM-171_apo at (13.90, 26.10, -36.41).
-0: Placed Na+ in 7QLP_TEM-171_apo at (13.30, -16.55, 40.02).
-0: Placed Na+ in 7QLP_TEM-171_apo at (38.74, 23.61, -4.52).
-0: Placed Na+ in 7QLP_TEM-171_apo at (17.82, 14.08, -18.22).
+0: Placed Na+ in 7QLP_TEM-171_apo at (-39.33, 29.77, -1.87).
+0: Placed Na+ in 7QLP_TEM-171_apo at (25.02, -20.21, 22.95).
+0: Placed Na+ in 7QLP_TEM-171_apo at (-32.25, -39.99, 34.53).
+0: Placed Na+ in 7QLP_TEM-171_apo at (-27.85, -33.93, 19.00).
+0: Placed Na+ in 7QLP_TEM-171_apo at (2.68, 14.99, -5.12).
+0: Placed Na+ in 7QLP_TEM-171_apo at (44.78, 17.55, -26.28).
+0: Placed Na+ in 7QLP_TEM-171_apo at (-26.50, 5.41, -40.49).
 
-/storage/home/hhive1/dyehorova3/.conda/envs/Kif/bin/teLeap: Warning!
+/storage/home/hhive1/dyehorova3/.conda/envs/AmberTools22/bin/teLeap: Warning!
 addIonsRand: 1st Ion & target unit have charges of the same sign:
      unit charge = -6.30607e-14; ion1 charge = -1;
      can't neutralize.
 Writing pdb file: 7QLP_TEM-171_apo_postleap.pdb
    printing CRYST1 record to PDB file with box info
 
-/storage/home/hhive1/dyehorova3/.conda/envs/Kif/bin/teLeap: Warning!
+/storage/home/hhive1/dyehorova3/.conda/envs/AmberTools22/bin/teLeap: Warning!
  Converting N-terminal residue name to PDB format: NHIE -> HIE
 
-/storage/home/hhive1/dyehorova3/.conda/envs/Kif/bin/teLeap: Warning!
+/storage/home/hhive1/dyehorova3/.conda/envs/AmberTools22/bin/teLeap: Warning!
  Converting C-terminal residue name to PDB format: CTRP -> TRP
 Checking Unit.
 Building topology.

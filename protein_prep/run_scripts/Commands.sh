@@ -97,7 +97,7 @@ do
         echo "$problematic_res"
 
         if [ "$problematic_res" != None ]; then
-                python $BASE_PREP/3_propka/update_protonation_states.py "$problematic_res"
+                python $BASE_PREP/3_propka/update_protonation_states.py "$problematic_res" || break
 	fi
 
 #Should manually inspect propka_check.log for non-standard pka predictions
@@ -112,7 +112,7 @@ do
         mv "${pdb_name}"_AMB.pdb "${pdb_name}"_apo.pdb # rename output. 
         cp $BASE_PREP/run_scripts/tleap.in .
 	sed -i "s/NAME/${pdb_name}/g" tleap.in
-	tleap -f tleap.in > tleap_${pdb_name}.out
+	tleap -f tleap.in > tleap_"${pdb_name}".out
 done
 
 # Inside the tleap.in file, 1 adjustable command. 
