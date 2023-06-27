@@ -1,6 +1,6 @@
 MD simulation
  &cntrl
-   imin = 0, nstlim = TIME, irest = 1, ntx = 5, dt = STEP ,
+   imin = 0, nstlim = 50000000, irest = 1, ntx = 5, dt = 0.002 ,
    ntt = 3, temp0 = 300.0, gamma_ln = 2.0, ig = -1,
    ntc = 2, ntf = 2,  cut = 10.0 , 
    ntb = 2, ntp = 1, pres0 = 1.0, taup = 1.0, barostat=2, 

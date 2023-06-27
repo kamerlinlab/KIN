@@ -1,92 +1,101 @@
--I: Adding /storage/home/hhive1/dyehorova3/.conda/envs/AmberTools22/dat/leap/prep to search path.
--I: Adding /storage/home/hhive1/dyehorova3/.conda/envs/AmberTools22/dat/leap/lib to search path.
--I: Adding /storage/home/hhive1/dyehorova3/.conda/envs/AmberTools22/dat/leap/parm to search path.
--I: Adding /storage/home/hhive1/dyehorova3/.conda/envs/AmberTools22/dat/leap/cmd to search path.
+-I: Adding /storage/home/hhive1/dyehorova3/.conda/envs/Kif/dat/leap/prep to search path.
+-I: Adding /storage/home/hhive1/dyehorova3/.conda/envs/Kif/dat/leap/lib to search path.
+-I: Adding /storage/home/hhive1/dyehorova3/.conda/envs/Kif/dat/leap/parm to search path.
+-I: Adding /storage/home/hhive1/dyehorova3/.conda/envs/Kif/dat/leap/cmd to search path.
 -f: Source tleap.in.
 
 Welcome to LEaP!
 (no leaprc in search path)
 Sourcing: ./tleap.in
------ Source: /storage/home/hhive1/dyehorova3/.conda/envs/AmberTools22/dat/leap/cmd/leaprc.protein.ff14SB
------ Source of /storage/home/hhive1/dyehorova3/.conda/envs/AmberTools22/dat/leap/cmd/leaprc.protein.ff14SB done
+----- Source: /storage/home/hhive1/dyehorova3/.conda/envs/Kif/dat/leap/cmd/leaprc.protein.ff14SB
+----- Source of /storage/home/hhive1/dyehorova3/.conda/envs/Kif/dat/leap/cmd/leaprc.protein.ff14SB done
 Log file: ./leap.log
-Loading parameters: /storage/home/hhive1/dyehorova3/.conda/envs/AmberTools22/dat/leap/parm/parm10.dat
+Loading parameters: /storage/home/hhive1/dyehorova3/.conda/envs/Kif/dat/leap/parm/parm10.dat
 Reading title:
 PARM99 + frcmod.ff99SB + frcmod.parmbsc0 + OL3 for RNA
-Loading parameters: /storage/home/hhive1/dyehorova3/.conda/envs/AmberTools22/dat/leap/parm/frcmod.ff14SB
+Loading parameters: /storage/home/hhive1/dyehorova3/.conda/envs/Kif/dat/leap/parm/frcmod.ff14SB
 Reading force field modification type file (frcmod)
 Reading title:
 ff14SB protein backbone and sidechain parameters
-Loading library: /storage/home/hhive1/dyehorova3/.conda/envs/AmberTools22/dat/leap/lib/amino12.lib
-Loading library: /storage/home/hhive1/dyehorova3/.conda/envs/AmberTools22/dat/leap/lib/aminoct12.lib
-Loading library: /storage/home/hhive1/dyehorova3/.conda/envs/AmberTools22/dat/leap/lib/aminont12.lib
------ Source: /storage/home/hhive1/dyehorova3/.conda/envs/AmberTools22/dat/leap/cmd/leaprc.water.tip3p
------ Source of /storage/home/hhive1/dyehorova3/.conda/envs/AmberTools22/dat/leap/cmd/leaprc.water.tip3p done
-Loading library: /storage/home/hhive1/dyehorova3/.conda/envs/AmberTools22/dat/leap/lib/atomic_ions.lib
-Loading library: /storage/home/hhive1/dyehorova3/.conda/envs/AmberTools22/dat/leap/lib/solvents.lib
-Loading parameters: /storage/home/hhive1/dyehorova3/.conda/envs/AmberTools22/dat/leap/parm/frcmod.tip3p
+Loading library: /storage/home/hhive1/dyehorova3/.conda/envs/Kif/dat/leap/lib/amino12.lib
+Loading library: /storage/home/hhive1/dyehorova3/.conda/envs/Kif/dat/leap/lib/aminoct12.lib
+Loading library: /storage/home/hhive1/dyehorova3/.conda/envs/Kif/dat/leap/lib/aminont12.lib
+----- Source: /storage/home/hhive1/dyehorova3/.conda/envs/Kif/dat/leap/cmd/leaprc.water.tip3p
+----- Source of /storage/home/hhive1/dyehorova3/.conda/envs/Kif/dat/leap/cmd/leaprc.water.tip3p done
+Loading library: /storage/home/hhive1/dyehorova3/.conda/envs/Kif/dat/leap/lib/atomic_ions.lib
+Loading library: /storage/home/hhive1/dyehorova3/.conda/envs/Kif/dat/leap/lib/solvents.lib
+Loading parameters: /storage/home/hhive1/dyehorova3/.conda/envs/Kif/dat/leap/parm/frcmod.tip3p
 Reading force field modification type file (frcmod)
 Reading title:
 This is the additional/replacement parameter set for TIP3P water
-Loading parameters: /storage/home/hhive1/dyehorova3/.conda/envs/AmberTools22/dat/leap/parm/frcmod.ions1lm_126_tip3p
+Loading parameters: /storage/home/hhive1/dyehorova3/.conda/envs/Kif/dat/leap/parm/frcmod.ions1lm_126_tip3p
 Reading force field modification type file (frcmod)
 Reading title:
 Li/Merz ion parameters of monovalent ions for TIP3P water model (12-6 normal usage set)
-Loading parameters: /storage/home/hhive1/dyehorova3/.conda/envs/AmberTools22/dat/leap/parm/frcmod.ionsjc_tip3p
+Loading parameters: /storage/home/hhive1/dyehorova3/.conda/envs/Kif/dat/leap/parm/frcmod.ionsjc_tip3p
 Reading force field modification type file (frcmod)
 Reading title:
 Monovalent ion parameters for Ewald and TIP3P water from Joung & Cheatham JPCB (2008)
-Loading parameters: /storage/home/hhive1/dyehorova3/.conda/envs/AmberTools22/dat/leap/parm/frcmod.ions234lm_126_tip3p
+Loading parameters: /storage/home/hhive1/dyehorova3/.conda/envs/Kif/dat/leap/parm/frcmod.ions234lm_126_tip3p
 Reading force field modification type file (frcmod)
 Reading title:
 Li/Merz ion parameters of divalent to tetravalent ions for TIP3P water model (12-6 normal usage set)
 Loading PDB file: ./5NJ2_BlaC_apo.pdb
-Created a new atom named: HZ1 within residue: .R<LYN 207>
-  total atoms in file: 3936
+  total atoms in file: 3935
   Leap added 1 missing atom according to residue templates:
        1 H / lone pairs
-  The file contained 1 atoms not in residue templates
-
-/storage/home/hhive1/dyehorova3/.conda/envs/AmberTools22/bin/teLeap: Warning!
-Since the number of added atoms equals the number of missing atoms, it is likely
-that some atoms had incorrect names; you may want to use addPdbAtomMap to map
-these names, or change the names in the PDB file.
-
   Solute vdw bounding box:              53.229 57.250 45.437
   Total bounding box for atom centers:  77.229 81.250 69.437
   Solvent unit box:                     18.774 18.774 18.774
   Total vdw box size:                   79.661 84.693 72.502 angstroms.
   Volume: 489156.628 A^3 
-  Mass > 243051.780 amu,  Density > 0.825 g/cc
-      (type - hence mass - of one or more atoms could not be found)
+  Total mass 243051.780 amu,  Density 0.825 g/cc
   Added 11930 residues.
 8 Na+ ions required to neutralize.
 Adding 8 counter ions to "5NJ2_BlaC_apo". 11922 solvent molecules will remain.
-0: Placed Na+ in 5NJ2_BlaC_apo at (32.86, 29.95, -23.36).
-0: Placed Na+ in 5NJ2_BlaC_apo at (28.52, -1.19, -8.34).
-0: Placed Na+ in 5NJ2_BlaC_apo at (14.61, 11.21, 27.69).
-0: Placed Na+ in 5NJ2_BlaC_apo at (12.98, 9.91, 24.98).
-0: Placed Na+ in 5NJ2_BlaC_apo at (-37.87, -37.34, 19.49).
-0: Placed Na+ in 5NJ2_BlaC_apo at (-3.44, -35.50, -25.18).
-0: Placed Na+ in 5NJ2_BlaC_apo at (-16.32, -38.38, 8.01).
-0: Placed Na+ in 5NJ2_BlaC_apo at (-18.26, -31.48, 20.43).
+0: Placed Na+ in 5NJ2_BlaC_apo at (37.33, 11.52, -1.94).
+0: Placed Na+ in 5NJ2_BlaC_apo at (23.00, 26.10, -26.74).
+0: Placed Na+ in 5NJ2_BlaC_apo at (-31.64, 3.54, -23.74).
+0: Placed Na+ in 5NJ2_BlaC_apo at (-18.65, 14.08, 33.30).
+0: Placed Na+ in 5NJ2_BlaC_apo at (20.47, 21.29, -31.86).
+0: Placed Na+ in 5NJ2_BlaC_apo at (-22.21, 20.82, -25.18).
+0: Placed Na+ in 5NJ2_BlaC_apo at (-11.92, 29.27, 19.85).
+0: Placed Na+ in 5NJ2_BlaC_apo at (4.07, -25.60, -23.36).
 
-/storage/home/hhive1/dyehorova3/.conda/envs/AmberTools22/bin/teLeap: Warning!
+/storage/home/hhive1/dyehorova3/.conda/envs/Kif/bin/teLeap: Warning!
 addIonsRand: 1st Ion & target unit have charges of the same sign:
      unit charge = -6.75016e-14; ion1 charge = -1;
      can't neutralize.
 Writing pdb file: 5NJ2_BlaC_apo_postleap.pdb
    printing CRYST1 record to PDB file with box info
 
-/storage/home/hhive1/dyehorova3/.conda/envs/AmberTools22/bin/teLeap: Warning!
+/storage/home/hhive1/dyehorova3/.conda/envs/Kif/bin/teLeap: Warning!
  Converting N-terminal residue name to PDB format: NLEU -> LEU
 
-/storage/home/hhive1/dyehorova3/.conda/envs/AmberTools22/bin/teLeap: Warning!
+/storage/home/hhive1/dyehorova3/.conda/envs/Kif/bin/teLeap: Warning!
  Converting C-terminal residue name to PDB format: CALA -> ALA
 Checking Unit.
-FATAL:  Atom .R<LYN 207>.A<HZ1 22> does not have a type.
+Building topology.
+Building atom parameters.
+Building bond parameters.
+Building angle parameters.
+Building proper torsion parameters.
+Building improper torsion parameters.
+ total 795 improper torsions applied
+Building H-Bond parameters.
+Incorporating Non-Bonded adjustments.
+Not Marking per-residue atom chain types.
+Marking per-residue atom chain types.
+  (Residues lacking connect0/connect1 - 
+   these don't have chain types marked:
 
-/storage/home/hhive1/dyehorova3/.conda/envs/AmberTools22/bin/teLeap: Fatal Error!
-Failed to generate parameters
+	res	total affected
 
-Exiting LEaP: Errors = 1; Warnings = 4; Notes = 0.
+	CALA	1
+	NLEU	1
+	WAT	11922
+  )
+ (no restraints)
+	Quit
+
+Exiting LEaP: Errors = 0; Warnings = 3; Notes = 0.
