@@ -18,6 +18,7 @@ setup(
     install_requires=[
         "pandas",
         "numpy",
+        "MDAnalysis",
         "plotly",  # TODO - maybe remove, only for making figures.
         # TODO - add more.
     ],
