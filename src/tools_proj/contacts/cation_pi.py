@@ -72,7 +72,7 @@ def check_for_cation_pi(res_numbers:tuple[int, int], universe) -> Optional[str]:
     if (res1_name == "LYS") or (res2_name == "LYS"): # Requirements passed for cation-pi
         return res1_name + str(res1_numb) + " " + res2_name + str(res2_numb) + " CationPi " + "SC-SC"
 
-    # if "Arg", then need to test theta2
+    # Means it is "Arg", so need to test theta2
     cation_normal_vector = normal_vector_3_atoms(cp_cation_atom_com.positions)
     cp_theta_2 = angle_between_two_vectors(cation_normal_vector, arom_normal_vector)
 
@@ -91,6 +91,5 @@ def check_for_cation_pi(res_numbers:tuple[int, int], universe) -> Optional[str]:
     if delta_tshaped_ideal <= CATION_PI_ANGLE_TOLERANCE:
         # tshaped Arg
         return res1_name + str(res1_numb) + " " + res2_name + str(res2_numb) + " CationPi " + "SC-SC"
-
 
     return None # bad theta2.

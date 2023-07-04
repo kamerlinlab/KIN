@@ -1,5 +1,5 @@
 """
-Code to calculate salt bridge based interactions
+Code to identify salt bridge based interactions
 """
 from typing import Optional
 from MDAnalysis.analysis import distances
@@ -31,8 +31,8 @@ def check_for_salt_bridge(res_numbers:tuple[int, int], universe) -> Optional[str
         box=universe.dimensions
     )
 
-    if sb_dists.min() > SB_DIST_CUTOFF: # not salt bridge
+    if sb_dists.min() > SB_DIST_CUTOFF: # too far away
         return None
 
-    salt_bridge_info_str = res1_name + str(res1_numb) + " " + res2_name + str(res2_numb) + " SB " + "SC-SC"
-    return salt_bridge_info_str
+    # info about detected salt bridge.
+    return res1_name + str(res1_numb) + " " + res2_name + str(res2_numb) + " SaltBridge " + "SC-SC"
