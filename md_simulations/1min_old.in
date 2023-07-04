@@ -3,8 +3,9 @@ minimization of solvent
   imin = 1, maxcyc = 1000,   
   ncyc = 20, ntx = 1,                     
   ntwe = 0, ntwr = 500, ntpr = 50,
-  ntc = 1, ntf = 1, ntb = 1, ntp = 0,
-  cut = 10.0, 
-  ntr=0, 
+  ntc = 2, ntf = 2, ntb = 1, ntp = 0,
+  cut = 10.0,   
+  ntr=1, restraintmask = ':1-TOTRES',
+  restraint_wt = 100.,
   ioutfm=1, ntxo=2,
  /
