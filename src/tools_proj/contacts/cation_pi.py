@@ -1,5 +1,5 @@
 """
-Code to identify cation-py interactions
+Code to identify cation-pi interactions
 
 Definitions are sourced from: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8338773/
 """
@@ -10,11 +10,11 @@ from MDAnalysis.analysis import distances
 from tools_proj.contacts.utils import angle_between_two_vectors, normal_vector_3_atoms
 
 # Constants
-CAT_PI_RES_ATOMS_CATION = {"LYS": "name NZ", "ARG": "name CZ"}
-CAT_PI_RES_ATOMS_CATION_COM = "name NH1 NH2 NE" # only for ARG
-CAT_PI_RES_ATOMS_PI = {"TRP": "name CE2 CE3 CH2", "TYR": "name CG CE1 CE2",
-                       "PHE": "name CG CE1 CE2", "HIE": "name CG CD2 CE1",
-                       "HID": "name CG CD2 CE1"} # HIP not included as positive
+CAT_PI_RES_ATOMS_CATION = {"LYS": "NZ", "ARG": "CZ"}
+CAT_PI_RES_ATOMS_CATION_COM = "NH1 NH2 NE" # only for ARG
+CAT_PI_RES_ATOMS_PI = {"TRP": "CE2 CE3 CH2", "TYR": "CG CE1 CE2",
+                       "PHE": "CG CE1 CE2", "HIE": "CG CD2 CE1",
+                       "HID": "CG CD2 CE1"} # HIP not included as positive
 
 # cutoffs
 CATION_PI_D_CUT = 6
@@ -27,33 +27,54 @@ CATION_PI_THETA_2_TSHAPED_IDEAL = 90 # Only applies to ARG
 
 
 def check_for_cation_pi(res_numbers:tuple[int, int], universe) -> Optional[str]:
-    """Given two residues, test if they have a cation-pi interaction"""
-    res1_numb, res2_numb = res_numbers
-    res1_sc_atoms = universe.select_atoms("not name C CA O N H and resid " + str(res1_numb))
-    res2_sc_atoms = universe.select_atoms("not name C CA O N H and resid " + str(res2_numb))
-    res1_name, res2_name = res1_sc_atoms.resnames[0], res2_sc_atoms.resnames[0]
+    """
+    Given two residues, test if they have a cation-pi interaction.
+    Function exits early when it becomes clear there is no interaction.
 
+    Parameters
+    ----------
+    res_numbers: tuple[int, int]
+        Two residues to test if there is a salt bridge.
+
+    universe: MDAnalysis.core.universe.Universe
+        MDAnalysis universe object.
+
+    Returns
+    -------
+    Optional[str]
+        If cation-pi present then a str is returned describing the cation-pi.
+        If no cation-pi, None returned.
+    """
+    res1_numb, res2_numb = res_numbers
+    res1_name = universe.residues.resnames[res1_numb-1] # 0-indexed
+    res2_name = universe.residues.resnames[res2_numb-1] # 0-indexed
 
     if (res1_name in CAT_PI_RES_ATOMS_CATION) and (res2_name in CAT_PI_RES_ATOMS_PI):
-        cp_cation_atom = res1_sc_atoms.select_atoms(CAT_PI_RES_ATOMS_CATION[res1_name])
-        cp_pi_atoms = res2_sc_atoms.select_atoms(CAT_PI_RES_ATOMS_PI[res2_name])
+        res1_sele_str = "name " + CAT_PI_RES_ATOMS_CATION[res1_name] + " and resid " + str(res1_numb)
+        res2_sele_str = "name " + CAT_PI_RES_ATOMS_PI[res2_name] + " and resid " + str(res2_numb)
+        cp_cation_atom = universe.select_atoms(res1_sele_str)
+        cp_pi_atoms = universe.select_atoms(res2_sele_str)
 
         if res1_name == "ARG":
-            cp_cation_atom_com = res1_sc_atoms.select_atoms(CAT_PI_RES_ATOMS_CATION_COM)
+            arg_sele_str = "name " + CAT_PI_RES_ATOMS_CATION_COM + " and resid " + str(res1_numb)
+            cp_cation_atom_com = universe.select_atoms(arg_sele_str)
 
     elif (res1_name in CAT_PI_RES_ATOMS_PI) and (res2_name in CAT_PI_RES_ATOMS_CATION):
-        cp_pi_atoms = res1_sc_atoms.select_atoms(CAT_PI_RES_ATOMS_PI[res1_name])
-        cp_cation_atom = res2_sc_atoms.select_atoms(CAT_PI_RES_ATOMS_CATION[res2_name])
+        res1_sele_str = "name " + CAT_PI_RES_ATOMS_PI[res1_name] + " and resid " + str(res1_numb)
+        res2_sele_str = "name " + CAT_PI_RES_ATOMS_CATION[res2_name] + " and resid " + str(res2_numb)
+        cp_pi_atoms = universe.select_atoms(res1_sele_str)
+        cp_cation_atom = universe.select_atoms(res2_sele_str)
 
         if res2_name == "ARG":
-            cp_cation_atom_com = res2_sc_atoms.select_atoms(CAT_PI_RES_ATOMS_CATION_COM)
+            arg_sele_str = "name " + CAT_PI_RES_ATOMS_CATION_COM + " and resid " + str(res2_numb)
+            cp_cation_atom_com = universe.select_atoms(arg_sele_str)
 
     else:
         return None
 
     # distance check.
     cp_dist = distances.distance_array(cp_pi_atoms.center_of_mass(), cp_cation_atom.positions, box=universe.dimensions)
-    if cp_dist > CATION_PI_D_CUT: # too far away
+    if cp_dist > CATION_PI_D_CUT: # bad distance
         return None
 
     # Theta 1 calculation.

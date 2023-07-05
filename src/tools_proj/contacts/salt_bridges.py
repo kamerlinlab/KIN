@@ -2,26 +2,50 @@
 Code to identify salt bridge based interactions
 """
 from typing import Optional
+import MDAnalysis
 from MDAnalysis.analysis import distances
 
 # constants.
-SB_RES_ATOMS_POSITIVE = {"LYS" : "name NZ", "ARG": "name NE NH1 NH2"}
-SB_RES_ATOMS_NEGATIVE = {"ASP" : "name OD1 OD2", "GLU": "name OE1 OE2"}
+SB_RES_ATOMS_POSITIVE = {"LYS" : "NZ", "ARG": "NE NH1 NH2"}
+SB_RES_ATOMS_NEGATIVE = {"ASP" : "OD1 OD2", "GLU": "OE1 OE2"}
 SB_DIST_CUTOFF = 4 # Ångstrom
 
-def check_for_salt_bridge(res_numbers:tuple[int, int], universe) -> Optional[str]:
-    """Given two residues, test if they meet the requirements to be a salt bridge"""
+def check_for_salt_bridge(res_numbers:tuple[int, int],
+                          universe:MDAnalysis.core.universe.Universe) -> Optional[str]:
+    """
+    Given two residues, test if they have a salt bridge interaction.
+    Function exits early when it becomes clear there is no interaction.
+
+    Parameters
+    ----------
+    res_numbers: tuple[int, int]
+        Two residues to test if there is a salt bridge.
+
+    universe: MDAnalysis.core.universe.Universe
+        MDAnalysis universe object.
+
+    Returns
+    -------
+    Optional[str]
+        If salt bridge present then a str is returned describing the salt bridge.
+        If no salt bridge, None returned.
+    """
     res1_numb, res2_numb = res_numbers
-    res1_sc_atoms = universe.select_atoms("not name C CA O N H and resid " + str(res1_numb))
-    res2_sc_atoms = universe.select_atoms("not name C CA O N H and resid " + str(res2_numb))
-    res1_name, res2_name = res1_sc_atoms.resnames[0], res2_sc_atoms.resnames[0]
+    res1_name = universe.residues.resnames[res1_numb-1] # 0-indexed
+    res2_name = universe.residues.resnames[res2_numb-1] # 0-indexed
 
     if (res1_name in SB_RES_ATOMS_POSITIVE) and (res2_name in SB_RES_ATOMS_NEGATIVE):
-        sb_res1_atoms = res1_sc_atoms.select_atoms(SB_RES_ATOMS_POSITIVE[res1_name])
-        sb_res2_atoms = res2_sc_atoms.select_atoms(SB_RES_ATOMS_NEGATIVE[res2_name])
+        res1_sele_str = "name " + SB_RES_ATOMS_POSITIVE[res1_name] + " and resid " + str(res1_numb)
+        res2_sele_str = "name " + SB_RES_ATOMS_NEGATIVE[res2_name] + " and resid " + str(res2_numb)
+        sb_res1_atoms = universe.select_atoms(res1_sele_str)
+        sb_res2_atoms = universe.select_atoms(res2_sele_str)
+
     elif (res1_name in SB_RES_ATOMS_NEGATIVE) and (res2_name in SB_RES_ATOMS_POSITIVE):
-        sb_res1_atoms = res1_sc_atoms.select_atoms(SB_RES_ATOMS_NEGATIVE[res1_name])
-        sb_res2_atoms = res2_sc_atoms.select_atoms(SB_RES_ATOMS_POSITIVE[res2_name])
+        res1_sele_str = "name " + SB_RES_ATOMS_NEGATIVE[res1_name] + " and resid " + str(res1_numb)
+        res2_sele_str = "name " + SB_RES_ATOMS_POSITIVE[res2_name] + " and resid " + str(res2_numb)
+        sb_res1_atoms = universe.select_atoms(res1_sele_str)
+        sb_res2_atoms = universe.select_atoms(res2_sele_str)
+
     else: # salt bridge not possible
         return None
 
