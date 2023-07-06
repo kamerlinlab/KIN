@@ -5,6 +5,7 @@ Definitions are sourced from: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC83387
 """
 from typing import Optional
 import numpy as np
+from MDAnalysis import Universe
 from MDAnalysis.analysis import distances
 
 from tools_proj.contacts.utils import angle_between_two_vectors, normal_vector_3_atoms
@@ -26,7 +27,7 @@ CATION_PI_THETA_2_STACKED_IDEAL = 0 # Only applies to ARG
 CATION_PI_THETA_2_TSHAPED_IDEAL = 90 # Only applies to ARG
 
 
-def check_for_cation_pi(res_numbers:tuple[int, int], universe) -> Optional[str]:
+def check_for_cation_pi(res_numbers:tuple[int, int], universe:Universe) -> Optional[str]:
     """
     Given two residues, test if they have a cation-pi interaction.
     Function exits early when it becomes clear there is no interaction.
@@ -36,7 +37,7 @@ def check_for_cation_pi(res_numbers:tuple[int, int], universe) -> Optional[str]:
     res_numbers: tuple[int, int]
         Two residues to test if there is a salt bridge.
 
-    universe: MDAnalysis.core.universe.Universe
+    universe: Universe
         MDAnalysis universe object.
 
     Returns
@@ -91,7 +92,7 @@ def check_for_cation_pi(res_numbers:tuple[int, int], universe) -> Optional[str]:
         return None # bad angle
 
     if (res1_name == "LYS") or (res2_name == "LYS"): # Requirements passed for cation-pi
-        return res1_name + str(res1_numb) + " " + res2_name + str(res2_numb) + " CationPi " + "SC-SC"
+        return res1_name + str(res1_numb) + " " + res2_name + str(res2_numb) + " cationpi " + "sc-sc"
 
     # Means it is "Arg", so need to test theta2
     cation_normal_vector = normal_vector_3_atoms(cp_cation_atom_com.positions)
@@ -103,7 +104,7 @@ def check_for_cation_pi(res_numbers:tuple[int, int], universe) -> Optional[str]:
     )
     if delta_stacked_ideal <= CATION_PI_ANGLE_TOLERANCE:
         # Stacked Arg
-        return res1_name + str(res1_numb) + " " + res2_name + str(res2_numb) + " CationPi " + "SC-SC"
+        return res1_name + str(res1_numb) + " " + res2_name + str(res2_numb) + " cationpi " + "sc-sc"
 
     delta_tshaped_ideal = min(
         np.abs(cp_theta_2 - CATION_PI_THETA_2_TSHAPED_IDEAL),
@@ -111,6 +112,6 @@ def check_for_cation_pi(res_numbers:tuple[int, int], universe) -> Optional[str]:
     )
     if delta_tshaped_ideal <= CATION_PI_ANGLE_TOLERANCE:
         # tshaped Arg
-        return res1_name + str(res1_numb) + " " + res2_name + str(res2_numb) + " CationPi " + "SC-SC"
+        return res1_name + str(res1_numb) + " " + res2_name + str(res2_numb) + " cationpi " + "sc-sc"
 
     return None # bad theta2.

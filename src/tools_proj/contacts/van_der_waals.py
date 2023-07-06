@@ -8,7 +8,7 @@ wc = whole chain (both bc and sc used in an interaction).
 """
 from typing import Optional
 import numpy as np
-import MDAnalysis
+from MDAnalysis import Universe
 from MDAnalysis.analysis.distances import distance_array
 
 # constants.
@@ -16,7 +16,7 @@ VDW_DIST_CUT = 4.5 # Ångstrom
 
 
 def check_for_vdw_interaction(
-        res_numbers:tuple[int, int], universe:MDAnalysis.core.universe.Universe) -> Optional[str]:
+        res_numbers:tuple[int, int], universe:Universe) -> Optional[str]:
     """
     Given two residues, test if they have a salt bridge interaction.
     Function exits early when it becomes clear there is no interaction.
@@ -31,7 +31,7 @@ def check_for_vdw_interaction(
     res_numbers: tuple[int, int]
         Two residues to test if there is a vdw's interaction.
 
-    universe: MDAnalysis.core.universe.Universe
+    universe: Universe
         MDAnalysis universe object.
 
     Returns

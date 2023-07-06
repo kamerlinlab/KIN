@@ -7,6 +7,7 @@ Definitions are sourced from: https://link.springer.com/article/10.1007/s12539-0
 """
 from typing import Optional
 import numpy as np
+from MDAnalysis import Universe
 from MDAnalysis.analysis import distances
 
 from tools_proj.contacts.utils import angle_between_two_vectors, normal_vector_3_atoms
@@ -25,7 +26,7 @@ PI_PI_GAMMA_TSHAPED_RANGE = (50, 130)
 # Other values would be classified as "intermediate".
 
 
-def check_for_pi_pi(res_numbers:tuple[int, int], universe, detailed_information:bool=False) -> Optional[str]:
+def check_for_pi_pi(res_numbers:tuple[int, int], universe:Universe, detailed_information:bool=False) -> Optional[str]:
     """
     Given two residues, test if they have a pi-pi interaction.
     Function exits early when it becomes clear there is no interaction.
@@ -35,7 +36,7 @@ def check_for_pi_pi(res_numbers:tuple[int, int], universe, detailed_information:
     res_numbers: tuple[int, int]
         Two residues to test if there is a salt bridge.
 
-    universe: MDAnalysis.core.universe.Universe
+    universe: Universe
         MDAnalysis universe object.
 
     detailed_information: bool
@@ -82,23 +83,23 @@ def check_for_pi_pi(res_numbers:tuple[int, int], universe, detailed_information:
 
     # Enough information to say this is a pi-pi stacking interaction now.
     if not detailed_information:
-        return res1_name + str(res1_numb) + " " + res2_name + str(res2_numb) + " PiPi " + "SC-SC"
+        return res1_name + str(res1_numb) + " " + res2_name + str(res2_numb) + " pipi " + "sc-sc"
 
     # Determine the specific type of pi-pi interaction.
     gamma = angle_between_two_vectors(res1_normal_vector, res2_normal_vector)
     gamma_corrected = min(np.abs(gamma), np.abs(gamma - 180))
 
     if PI_PI_GAMMA_TSHAPED_RANGE[0] <= gamma_corrected <= PI_PI_GAMMA_TSHAPED_RANGE[1]:
-        return res1_name + str(res1_numb) + " " + res2_name + str(res2_numb) + " PiPi_T_Shaped " + "SC-SC"
+        return res1_name + str(res1_numb) + " " + res2_name + str(res2_numb) + " pipi_t_shaped " + "sc-sc"
 
     if (gamma_corrected >= PI_PI_GAMMA_STACK_RANGE[0]) and (gamma_corrected <= PI_PI_GAMMA_STACK_RANGE[1]):
         # Then stacked/parralel.
 
         if (theta_corrected >= 80) or (delta_corrected >= 80):
-            return res1_name + str(res1_numb) + " " + res2_name + str(res2_numb) + " PiPi_Stacked_face_to_face  " + "SC-SC"
+            return res1_name + str(res1_numb) + " " + res2_name + str(res2_numb) + " pipi_stacked_face_to_face  " + "sc-sc"
 
         # otherwise offset stacked
-        return res1_name + str(res1_numb) + " " + res2_name + str(res2_numb) + " PiPi_Stacked_offset " + "SC-SC"
+        return res1_name + str(res1_numb) + " " + res2_name + str(res2_numb) + " pipi_stacked_offset " + "sc-sc"
 
     # if not either of the above, then "intermediate conformation"
-    return res1_name + str(res1_numb) + " " + res2_name + str(res2_numb) + " PiPi_intermediate_conf " + "SC-SC"
+    return res1_name + str(res1_numb) + " " + res2_name + str(res2_numb) + " pipi_intermediate_conf " + "sc-sc"

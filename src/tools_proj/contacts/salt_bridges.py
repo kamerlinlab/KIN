@@ -2,7 +2,7 @@
 Code to identify salt bridge based interactions
 """
 from typing import Optional
-import MDAnalysis
+from MDAnalysis import Universe
 from MDAnalysis.analysis import distances
 
 # constants.
@@ -11,7 +11,7 @@ SB_RES_ATOMS_NEGATIVE = {"ASP" : "OD1 OD2", "GLU": "OE1 OE2"}
 SB_DIST_CUTOFF = 4 # Ångstrom
 
 def check_for_salt_bridge(res_numbers:tuple[int, int],
-                          universe:MDAnalysis.core.universe.Universe) -> Optional[str]:
+                          universe:Universe) -> Optional[str]:
     """
     Given two residues, test if they have a salt bridge interaction.
     Function exits early when it becomes clear there is no interaction.
@@ -21,7 +21,7 @@ def check_for_salt_bridge(res_numbers:tuple[int, int],
     res_numbers: tuple[int, int]
         Two residues to test if there is a salt bridge.
 
-    universe: MDAnalysis.core.universe.Universe
+    universe: Universe
         MDAnalysis universe object.
 
     Returns
@@ -59,4 +59,4 @@ def check_for_salt_bridge(res_numbers:tuple[int, int],
         return None
 
     # info about detected salt bridge.
-    return res1_name + str(res1_numb) + " " + res2_name + str(res2_numb) + " SaltBridge " + "SC-SC"
+    return res1_name + str(res1_numb) + " " + res2_name + str(res2_numb) + " saltbridge " + "sc-sc"
