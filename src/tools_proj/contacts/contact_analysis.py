@@ -1,12 +1,14 @@
 """
 Provides the user interface to run contact analysis.
 
-This will be the main file to define how the user interacts with the contact module.
-TODO: Think about how to make compataible with multi-frame file.
 """
 from typing import Optional
 import warnings
+import time
+from datetime import timedelta
 
+import numpy as np
+import pandas as pd
 from MDAnalysis import Universe
 from MDAnalysis.analysis import distances
 
@@ -18,46 +20,113 @@ from tools_proj.contacts.pi_pi import check_for_pi_pi
 from tools_proj.contacts.van_der_waals import check_for_vdw_interaction
 
 
-def single_frame_contact_analysis(topology_file:str,
+def single_frame_contact_analysis(
                              trajectory_file:str,
                              out_file: str,
+                             topology_file:Optional[str] = None,
                              first_res: Optional[int] = None,
                              last_res: Optional[int] = None,
+                             report_time_taken: bool = True
                              ):
     """
-    Identify all contacts for a single frame/structure.
-
-    TODO: Can we make it possible for user to edit the defaults for a cut-off:e.g. hydrogen bond distance.
-    TODO: Should the topology become optional? As PDB only is also possible
-    TODO: Complete logic that covers if e.g. a salt bridge is found we don't also report a sc-sc h bond
+    This
     """
-    # not required for any of the tasts below.
-    warnings.filterwarnings("ignore", message="Element information is missing")
-    universe = Universe(topology_file, trajectory_file)
+    universe, start_res, final_res, ca_atoms = _prep_system(
+        trajectory_file=trajectory_file,
+        topology_file=topology_file,
+        first_res=first_res,
+        last_res=last_res
+    )
 
-    if first_res is None:
-        first_res = 1
-    if last_res is None:
-        last_res = len(universe.atoms.residues)
+    if report_time_taken:
+        start_time = time.monotonic()
 
-    # important that this calculation is done on all residues so matrix indexing matches up.
-    ca_atoms = universe.select_atoms(f"name CA and resid 1-{len(universe.atoms.residues)}")
+    # important this is done on all atoms so indexing matches up.
     ca_dist_matrix = distances.distance_array(ca_atoms, ca_atoms, box=universe.dimensions)
+    print("Sytem setup complete, identifying interactions now.")
 
+    # identify all contacts in the frame.
+    contacts_found = _process_single_frame(
+        universe=universe,
+        start_res=start_res,
+        final_res=final_res,
+        ca_dist_matrix=ca_dist_matrix)
+
+    if report_time_taken:
+        end_time = time.monotonic()
+        delta_time = timedelta(seconds=end_time - start_time)
+        print(f"Time taken: {delta_time}")
+
+    return contacts_found
+
+
+def multi_frame_contact_analysis(trajectory_file:str,
+                             out_file: str,
+                             topology_file:Optional[str] = None,
+                             first_res: Optional[int] = None,
+                             last_res: Optional[int] = None,
+                             report_time_taken: bool = True
+                             ):
+    """
+    TESTING TESTING TESTING...
+    """
+    universe, start_res, final_res, ca_atoms = _prep_system(
+        trajectory_file=trajectory_file,
+        topology_file=topology_file,
+        first_res=first_res,
+        last_res=last_res
+    )
+
+    if report_time_taken:
+        start_time = time.monotonic()
     print("Setup complete, identifying interactions now.")
 
+    all_interactions = []
+    for _ in universe.trajectory: # "_" is the current "timestep"
+
+        # important this is done on all atoms so indexing matches up.
+        ca_dist_matrix = distances.distance_array(ca_atoms, ca_atoms, box=universe.dimensions)
+
+        # identify all contacts in the frame.
+        per_frame_results = _process_single_frame(
+            universe=universe,
+            start_res=start_res,
+            final_res=final_res,
+            ca_dist_matrix=ca_dist_matrix)
+
+        all_interactions.append(per_frame_results)
+
+    if report_time_taken:
+        end_time = time.monotonic()
+        delta_time = timedelta(seconds=end_time - start_time)
+        print(f"Time taken: {delta_time}")
+
+    # TODO - will need to decide how to combine the per frame results.
+
+    # for now, before final output file format decided upon and standardised etc...
+    return all_interactions
+
+
+
+def _process_single_frame(universe: Universe,
+                          start_res: int,
+                          final_res: int,
+                          ca_dist_matrix:np.ndarray
+                          ) -> list[str]:
+    """
+    Main logic occurs here...
+
+    """
     interactions_found = []
-    for res1 in range(first_res, last_res + 1):
-        for res2 in range(res1, len(universe.residues) + 1):
-            if res1 == res2:
+    for res1 in range(start_res, final_res + 1):
+        for res2 in range(res1, final_res + 1):
+
+            # two quick tests to filter out interactions.
+            ca_ca_dist = ca_dist_matrix[res1-1, res2-1] # 0-indexed
+            if (res1 == res2) or ca_ca_dist > 20:
                 continue
 
-            # If residues CA-CA dist is greater than 20 A, skip.
-            ca_dist = ca_dist_matrix[res1-1, res2-1] # 0-indexed
-            if ca_dist > 20:
-                continue
-
-            # keeps track of interactions found for current residue pair.
+            # keeps track of interactions found for current residue pair and timestep.
             found_interactions = {"mc-mc": False, "sc-mc": False, "mc-sc": False, "sc-sc": False}
 
             # Now begin searching for interactions.
@@ -99,5 +168,50 @@ def single_frame_contact_analysis(topology_file:str,
             if result:
                 interactions_found.append(result)
 
-    # for now, before final output file format decided upon and standardised etc...
     return interactions_found
+
+
+def _prep_system(trajectory_file:str,
+                 topology_file:Optional[str] = None,
+                 first_res: Optional[int] = None,
+                 last_res: Optional[int] = None,
+):
+    """
+    Handles the setup of single or multi-frame trajectory analysis.
+
+    """
+
+    # not required for any of the tasks below.
+    warnings.filterwarnings("ignore", message="Element information is missing")
+
+    if topology_file:
+        universe = Universe(topology_file, trajectory_file)
+    else:
+        universe = Universe(trajectory_file)
+
+    ca_atoms = universe.select_atoms("name CA")
+    if first_res is None:
+        start_res = min(ca_atoms.resids)
+    else:
+        start_res = first_res
+    if last_res is None:
+        final_res = max(ca_atoms.resids)
+    else:
+        final_res = last_res
+
+    return universe, start_res, final_res, ca_atoms
+
+
+# def _merge_multi_frame_results(all_interactions: list[list]) -> pd.DataFrame:
+#     """
+#     Given a list of results from the single frame analysis, produce a dataframe with
+#     columns each unique interaction, and their occupancy (1 or 0).
+
+
+#     TODO - optional param to merge at residue level?
+
+#     """
+
+
+
+#     return "hello"
