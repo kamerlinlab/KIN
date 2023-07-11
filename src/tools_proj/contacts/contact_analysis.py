@@ -13,7 +13,7 @@ import time
 from datetime import timedelta
 
 import numpy as np
-import pandas as pd # will use soon, TODO.
+import pandas as pd
 import MDAnalysis
 from MDAnalysis import Universe
 from MDAnalysis.analysis import distances
@@ -160,12 +160,9 @@ def multi_frame_contact_analysis(
         delta_time = timedelta(seconds=end_time - start_time)
         print(f"Time taken: {delta_time}")
 
-    # TODO - will need to decide how to combine the per frame results.
-
-    # for now, before final output file format decided upon and standardised etc...
-    return all_interactions
-
-
+    results_df = _format_multi_frame_results(all_interactions)
+    results_df.to_csv(out_file)
+    return results_df
 
 def _process_single_frame(universe: Universe,
                           start_res: int,
@@ -253,7 +250,7 @@ def _process_single_frame(universe: Universe,
                 continue # residues too close in sequence to be interesting...
 
             if any(list(found_interactions.values())):
-                continue # no vdw_check required if other type of interaction found.
+                continue # no vdw_check required if any other type of interaction found.
 
             result = check_for_vdw_interaction(res_numbers=(res1, res2), universe=universe)
             if result:
@@ -324,16 +321,48 @@ def _prep_system(
     return universe, start_res, final_res, ca_atoms
 
 
-# def format_multi_frame_results(all_interactions: list[list]) -> pd.DataFrame:
-#     """
-#     Given a list of results from the single frame analysis, produce a dataframe with
-#     columns each unique interaction, and their occupancy (1 or 0).
+def _format_multi_frame_results(all_interactions: list[list[str]]) -> pd.DataFrame:
+    """
+    Given a list of results from the single frame analysis, produce a dataframe with
+    columns each unique interaction, and their occupancy (1 or 0).
+
+    Parameters
+    ----------
+    all_interactions: list[ list[str] ]
+        List of all interactions identified across a trajectory.
+        Outer list is the trajectory frame.
+        Inner list is of the interactions found for that frame.
+
+    Returns
+    -------
+    pd.DataFrame
+        Dataframe with columns being each unique interaction.
+        Rows correspond to each frame in the trajectory,
+        with 1 = interaction present, 0 = not present.
 
 
-#     TODO - optional param to merge at residue level? - or seperate function?
 
-#     """
+    TODO - optional param to merge at residue level? - or seperate function?
+    """
+    unique_interactions = []
+    for frame in all_interactions:
+        for interaction in frame:
+            if interaction in unique_interactions:
+                continue
+            else:
+                unique_interactions.append(interaction)
 
+    # Initialise an empty dictionary for each interaction.
+    # Per frame results (present - 1, or not - 0) will be added here.
+    per_frame_results = {}
+    for interaction in unique_interactions:
+        per_frame_results[interaction] = []
 
+    for frame in all_interactions:
+        for interaction in unique_interactions:
+            if interaction in frame:
+                per_frame_results[interaction].append(1)
+            else:
+                per_frame_results[interaction].append(0)
 
-#     return "hello"
+    return pd.DataFrame(per_frame_results)
