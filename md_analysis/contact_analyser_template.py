@@ -5,8 +5,8 @@ and access to a single node, just to see how long it takes and the others can be
 """
 from key_interactions_finder import contact_identification
 
-TOPOLOGY_FILE = "PROC_PATH/Trajectories/sys_SYSTEM/SYSTEM_apo.prmtop"
-TRAJECTORY_FILE = "PROC_PATH/Trajectories/sys_SYSTEM/SYSTEM_apo_all_runs.nc"
+TOPOLOGY_FILE = "RUN_PATH/sys_SYSTEM/clean_all_runs/clean.SYSTEM_apo.prmtop"
+TRAJECTORY_FILE = "RUN_PATH/sys_SYSTEM/clean_all_runs/SYSTEM_apo_all_runs.nc"
 
 # Version 1. We could try this first Dariia, may run out of memory though.
 contact_identification.calculate_contacts(

@@ -1,0 +1,43 @@
+---------------------------------------
+Begin Slurm Prolog: Jun-30-2023 11:06:19
+Job ID:    813323
+User ID:   dyehorova3
+Account:   hive-skamerlin3
+Job name:  RUN_SYSTEM
+Partition: hive-gpu-short
+---------------------------------------
+
+CommandNotFoundError: Your shell has not been properly configured to use 'conda deactivate'.
+To initialize your shell, run
+
+    $ conda init <SHELL_NAME>
+
+Currently supported shells are:
+  - bash
+  - fish
+  - tcsh
+  - xonsh
+  - zsh
+  - powershell
+
+See 'conda init --help' for more information and options.
+
+IMPORTANT: You may need to close and restart your shell after running 'conda init'.
+
+
+  File "/storage/hive/project/chem-kamerlin/dyehorova3/tools/tools-project/md_analysis/Contacts/pickle_to_csv.py", line 21
+    {
+    ^
+SyntaxError: invalid syntax. Perhaps you forgot a comma?
+---------------------------------------
+Begin Slurm Epilog: Jun-30-2023 15:06:24
+Job ID:        813323
+Array Job ID:  _4294967294
+User ID:       dyehorova3
+Account:       hive-skamerlin3
+Job name:      RUN_SYSTEM
+Resources:     cpu=6,gres/gpu:v100=1,mem=24G,node=1
+Rsrc Used:     cput=23:42:30,vmem=431844K,walltime=03:57:05,mem=99068K,energy_used=0
+Partition:     hive-gpu-short
+Nodes:         atl1-1-01-018-21-0
+---------------------------------------
