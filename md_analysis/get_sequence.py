@@ -1,5 +1,5 @@
 from modeller import *
-code = '3BLM_blaZ_apo_postleap'
+code = 'SYSTEM'
 
 e = Environ()
 m = Model(e, file=code)
