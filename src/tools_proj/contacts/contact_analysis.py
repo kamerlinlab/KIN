@@ -13,27 +13,28 @@ import time
 from datetime import timedelta
 
 import numpy as np
-import pandas as pd # will use soon, TODO.
+import pandas as pd  # will use soon, TODO.
 import MDAnalysis
 from MDAnalysis import Universe
 from MDAnalysis.analysis import distances
 
 from tools_proj.contacts.salt_bridges import check_for_salt_bridge
+
 # from tools_proj.contacts.hydrogen_bonds import check_for_hydrogen_bond # TODO
 from tools_proj.contacts.cation_pi import check_for_cation_pi
 from tools_proj.contacts.pi_pi import check_for_pi_pi
-# from tools_proj.contacts.hydrophobic import check_for_hydrophobic # TODO
+from tools_proj.contacts.hydrophobic import check_for_hydrophobic  # TODO
 from tools_proj.contacts.van_der_waals import check_for_vdw_interaction
 
 
 def single_frame_contact_analysis(
     out_file: str,
-    coordinates_file:str,
-    topology_file:Optional[str] = None,
+    coordinates_file: str,
+    topology_file: Optional[str] = None,
     first_res: Optional[int] = None,
     last_res: Optional[int] = None,
-    report_time_taken: bool = True
-    ):
+    report_time_taken: bool = True,
+):
     """
     Identify all contacts present in a single structure.
     If you have multiple frames to analyse,
@@ -83,14 +84,16 @@ def single_frame_contact_analysis(
         coords_file=coordinates_file,
         topology_file=topology_file,
         first_res=first_res,
-        last_res=last_res
+        last_res=last_res,
     )
 
     if report_time_taken:
         start_time = time.monotonic()
 
     # important this is done on all atoms so indexing matches up.
-    ca_dist_matrix = distances.distance_array(ca_atoms, ca_atoms, box=universe.dimensions)
+    ca_dist_matrix = distances.distance_array(
+        ca_atoms, ca_atoms, box=universe.dimensions
+    )
     print("Sytem setup complete, identifying interactions now.")
 
     # identify all contacts in the frame.
@@ -98,8 +101,8 @@ def single_frame_contact_analysis(
         universe=universe,
         start_res=start_res,
         final_res=final_res,
-        ca_dist_matrix=ca_dist_matrix)
-
+        ca_dist_matrix=ca_dist_matrix,
+    )
 
     with open(out_file, "w", encoding="utf-8") as tfile:
         tfile.write("Res1 Res2 Interaction_Type Residue_Parts \n")
@@ -116,12 +119,12 @@ def single_frame_contact_analysis(
 
 def multi_frame_contact_analysis(
     out_file: str,
-    trajectory_file:str,
-    topology_file:Optional[str] = None,
+    trajectory_file: str,
+    topology_file: Optional[str] = None,
     first_res: Optional[int] = None,
     last_res: Optional[int] = None,
-    report_time_taken: bool = True
-    ):
+    report_time_taken: bool = True,
+):
     """
     Identify all contacts present in a trajectory file.
     If you have only a single frame to analyse,
@@ -133,7 +136,7 @@ def multi_frame_contact_analysis(
         coords_file=trajectory_file,
         topology_file=topology_file,
         first_res=first_res,
-        last_res=last_res
+        last_res=last_res,
     )
 
     if report_time_taken:
@@ -141,17 +144,19 @@ def multi_frame_contact_analysis(
     print("Setup complete, identifying interactions now.")
 
     all_interactions = []
-    for _ in universe.trajectory: # "_" is the current "timestep"
-
+    for _ in universe.trajectory:  # "_" is the current "timestep"
         # important this is done on all atoms so indexing matches up.
-        ca_dist_matrix = distances.distance_array(ca_atoms, ca_atoms, box=universe.dimensions)
+        ca_dist_matrix = distances.distance_array(
+            ca_atoms, ca_atoms, box=universe.dimensions
+        )
 
         # identify all contacts in the frame.
         per_frame_results = _process_single_frame(
             universe=universe,
             start_res=start_res,
             final_res=final_res,
-            ca_dist_matrix=ca_dist_matrix)
+            ca_dist_matrix=ca_dist_matrix,
+        )
 
         all_interactions.append(per_frame_results)
 
@@ -166,12 +171,9 @@ def multi_frame_contact_analysis(
     return all_interactions
 
 
-
-def _process_single_frame(universe: Universe,
-                          start_res: int,
-                          final_res: int,
-                          ca_dist_matrix:np.ndarray
-                          ) -> list[str]:
+def _process_single_frame(
+    universe: Universe, start_res: int, final_res: int, ca_dist_matrix: np.ndarray
+) -> list[str]:
     """
     The main logic to analyse a single structure/frame.
 
@@ -197,12 +199,12 @@ def _process_single_frame(universe: Universe,
         Formatting is as follows:
         [residue 1] [residue 2] [interaction type] [part(s) of residue involved]
     """
+    # TODO can be significantly speeded up if the first residue ananlysis is only done in the outermost loop
     interactions_found = []
     for res1 in range(start_res, final_res + 1):
         for res2 in range(res1, final_res + 1):
-
             try:
-                ca_ca_dist = ca_dist_matrix[res1-1, res2-1] # 0-indexed
+                ca_ca_dist = ca_dist_matrix[res1 - 1, res2 - 1]  # 0-indexed
             except IndexError as error:
                 ca_atoms = universe.select_atoms("name CA")
                 last_res_numb = max(ca_atoms.resids)
@@ -218,7 +220,12 @@ def _process_single_frame(universe: Universe,
                 continue
 
             # keeps track of interactions found for current residue pair and timestep.
-            found_interactions = {"mc-mc": False, "sc-mc": False, "mc-sc": False, "sc-sc": False}
+            found_interactions = {
+                "mc-mc": False,
+                "sc-mc": False,
+                "mc-sc": False,
+                "sc-sc": False,
+            }
 
             # Now begin searching for interactions.
             result = check_for_salt_bridge(res_numbers=(res1, res2), universe=universe)
@@ -232,7 +239,9 @@ def _process_single_frame(universe: Universe,
             #     interactions_found.append(result)
 
             if not found_interactions["sc-sc"]:
-                result = check_for_cation_pi(res_numbers=(res1, res2), universe=universe)
+                result = check_for_cation_pi(
+                    res_numbers=(res1, res2), universe=universe
+                )
                 if result:
                     found_interactions["sc-sc"] = True
                     interactions_found.append(result)
@@ -243,19 +252,23 @@ def _process_single_frame(universe: Universe,
                     found_interactions["sc-sc"] = True
                     interactions_found.append(result)
 
-            # if not found_interactions["sc-sc"]:
-            #     result = check_for_hydrophobic(res_numbers=(res1, res2), universe=universe)
-            #     if result:
-            #         found_interactions["sc-sc"] = True
-            #         interactions_found.append(result)
+            if not found_interactions["sc-sc"]:
+                result = check_for_hydrophobic(
+                    res_numbers=(res1, res2), universe=universe
+                )
+                if result:
+                    found_interactions["sc-sc"] = True
+                    interactions_found.append(result)
 
-            if abs(res1-res2) <= 3:
-                continue # residues too close in sequence to be interesting...
+            if abs(res1 - res2) <= 3:
+                continue  # residues too close in sequence to be interesting...
 
             if any(list(found_interactions.values())):
-                continue # no vdw_check required if other type of interaction found.
+                continue  # no vdw_check required if other type of interaction found.
 
-            result = check_for_vdw_interaction(res_numbers=(res1, res2), universe=universe)
+            result = check_for_vdw_interaction(
+                res_numbers=(res1, res2), universe=universe
+            )
             if result:
                 interactions_found.append(result)
 
@@ -263,8 +276,8 @@ def _process_single_frame(universe: Universe,
 
 
 def _prep_system(
-    coords_file:str,
-    topology_file:Optional[str] = None,
+    coords_file: str,
+    topology_file: Optional[str] = None,
     first_res: Optional[int] = None,
     last_res: Optional[int] = None,
 ) -> tuple[Universe, int, int, MDAnalysis.core.groups.AtomGroup]:
@@ -333,7 +346,6 @@ def _prep_system(
 #     TODO - optional param to merge at residue level? - or seperate function?
 
 #     """
-
 
 
 #     return "hello"
