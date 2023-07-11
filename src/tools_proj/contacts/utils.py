@@ -2,6 +2,7 @@
 Useful functions for contact analysis.
 """
 import numpy as np
+
 RADIANS_TO_DEGREES = 57.2958
 
 
@@ -13,6 +14,7 @@ def angle_between_two_vectors(v1, v2):
     v2_u = _unit_vector(v2)
     angle = np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0))
     return angle * RADIANS_TO_DEGREES
+
 
 def _unit_vector(vector):
     """

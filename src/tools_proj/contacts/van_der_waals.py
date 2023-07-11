@@ -12,11 +12,12 @@ from MDAnalysis import Universe
 from MDAnalysis.analysis.distances import distance_array
 
 # constants.
-VDW_DIST_CUT = 4.5 # Ångstrom
+VDW_DIST_CUT = 4.5  # Ångstrom
 
 
 def check_for_vdw_interaction(
-        res_numbers:tuple[int, int], universe:Universe) -> Optional[str]:
+    res_numbers: tuple[int, int], universe: Universe
+) -> Optional[str]:
     """
     Given two residues, test if they have a salt bridge interaction.
     Function exits early when it becomes clear there is no interaction.
@@ -41,8 +42,8 @@ def check_for_vdw_interaction(
         If no vdw's interaction, None returned.
     """
     res1_numb, res2_numb = res_numbers
-    res1_name = universe.residues.resnames[res1_numb-1] # 0-indexed
-    res2_name = universe.residues.resnames[res2_numb-1] # 0-indexed
+    res1_name = universe.residues.resnames[res1_numb - 1]  # 0-indexed
+    res2_name = universe.residues.resnames[res2_numb - 1]  # 0-indexed
 
     # ~3x faster to test all distances now,
     # instead of waiting until all selections are made below.
@@ -68,21 +69,28 @@ def check_for_vdw_interaction(
 
     # calculate the min distance between all available pairs.
     min_dists = {}
-    min_dists["mc_mc"] = np.min(distance_array(vdw_res1_mc_atoms.positions, vdw_res2_mc_atoms.positions))
+    min_dists["mc_mc"] = np.min(
+        distance_array(vdw_res1_mc_atoms.positions, vdw_res2_mc_atoms.positions)
+    )
 
     if res1_name != "GLY":
-        min_dists["sc_mc"] = np.min(distance_array(vdw_res1_sc_atoms.positions, vdw_res2_mc_atoms.positions))
+        min_dists["sc_mc"] = np.min(
+            distance_array(vdw_res1_sc_atoms.positions, vdw_res2_mc_atoms.positions)
+        )
 
     if res2_name != "GLY":
-        min_dists["mc_sc"] = np.min(distance_array(vdw_res1_mc_atoms.positions, vdw_res2_sc_atoms.positions))
+        min_dists["mc_sc"] = np.min(
+            distance_array(vdw_res1_mc_atoms.positions, vdw_res2_sc_atoms.positions)
+        )
 
     if (res1_name != "GLY") and (res2_name != "GLY"):
-        min_dists["sc_sc"] = np.min(distance_array(vdw_res1_sc_atoms.positions, vdw_res2_sc_atoms.positions))
-
+        min_dists["sc_sc"] = np.min(
+            distance_array(vdw_res1_sc_atoms.positions, vdw_res2_sc_atoms.positions)
+        )
 
     # determine which parts (mainchain or sidechain or both) are involved for both residues.
     # wc = whole chain, i.e. both mc and sc interacting for that residue.
-    res1_interacting_parts, res2_interacting_parts  = set(), set()
+    res1_interacting_parts, res2_interacting_parts = set(), set()
     for residue_parts, min_dist in min_dists.items():
         if min_dist > VDW_DIST_CUT:
             continue
@@ -102,4 +110,14 @@ def check_for_vdw_interaction(
         res2_label = list(res2_interacting_parts)[0]
 
     # info about detected vdw interaction.
-    return res1_name + str(res1_numb) + " " + res2_name + str(res2_numb) + " vdw " + res1_label + "-" + res2_label
+    return (
+        res1_name
+        + str(res1_numb)
+        + " "
+        + res2_name
+        + str(res2_numb)
+        + " vdw "
+        + res1_label
+        + "-"
+        + res2_label
+    )
