@@ -49,13 +49,16 @@ def check_for_vdw_interaction(
     # instead of waiting until all selections are made below.
     res1_atoms = universe.select_atoms(f"not name H* and resid {str(res1_numb)}")
     res2_atoms = universe.select_atoms(f"not name H* and resid {str(res2_numb)}")
+
     min_dist = np.min(distance_array(res1_atoms.positions, res2_atoms.positions))
+
     if min_dist > VDW_DIST_CUT:
         return None
 
     # Build selections of the mcs and scs (where possible)
-    res1_mc_sele_str = "name N CA C O and resid " + str(res1_numb)
-    res2_mc_sele_str = "name N CA C O and resid " + str(res2_numb)
+    # (OXT is an oxygen that can be found on a C-terminal residue backbone)
+    res1_mc_sele_str = "name N CA C O OXT and resid " + str(res1_numb)
+    res2_mc_sele_str = "name N CA C O OXT and resid " + str(res2_numb)
     vdw_res1_mc_atoms = universe.select_atoms(res1_mc_sele_str)
     vdw_res2_mc_atoms = universe.select_atoms(res2_mc_sele_str)
 
