@@ -69,20 +69,20 @@ for file_path in msa_df_files:
     merged_dataframe.to_csv(NETWORK_OUTPUT, index=False)
 
     if file_path.endswith("1M40_TEM-1_msa.csv"):
-        TEM1_df = merged_dataframe
+        TEM1_df = merged_dataframe[["Interaction_Type", "Res1_msa", "Res2_msa"]]
 
 
 for file_path in network_files:
     df = pd.read_csv(file_path)
 
     merged_dataframe = pd.merge(
-        df, TEM1_df, on=["Interaction_Type", "Res1_msa", "Res2_msa"]
+        TEM1_df, df, on=["Interaction_Type", "Res1_msa", "Res2_msa"]
     )
     file_name = os.path.basename(file_path)
     file_name_without_extension = os.path.splitext(file_name)[0]
     print(
         file_name,
-        ": preserved interactions with the same interaction type as TEM",
+        ": preserved interactions of TEM type",
         merged_dataframe.shape[0],
     )
     NETWORK_OUTPUT = (
