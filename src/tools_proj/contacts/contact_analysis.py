@@ -19,8 +19,7 @@ from MDAnalysis import Universe
 from MDAnalysis.analysis import distances
 
 from tools_proj.contacts.salt_bridges import check_for_salt_bridge, check_for_c_term_salt_bridge
-
-# from tools_proj.contacts.hydrogen_bonds import check_for_hydrogen_bond # TODO
+from tools_proj.contacts.hbonds import check_for_hbond
 from tools_proj.contacts.cation_pi import check_for_cation_pi
 from tools_proj.contacts.pi_pi import check_for_pi_pi
 from tools_proj.contacts.hydrophobic import check_for_hydrophobic
@@ -234,14 +233,21 @@ def _process_single_frame(
                     res_numbers=(res1, res2), c_term_res_numbs=c_term_res_numbs, universe=universe
                 )
                 if result:
-                    interaction_type = result[3]  # mc-sc or sc-mc possible.
+                    interaction_type = result.split(" ")[3]  # mc-sc or sc-mc possible.
                     found_interactions[interaction_type] = True
                     interactions_found.append(result)
 
-            # result = check_for_hydrogen_bond(res_numbers=(res1, res2), universe=universe)
-            # TODO - will be a bit more challegning to define which interactions to find.
-            # if result:
-            #     interactions_found.append(result)
+            results = check_for_hbond(res_numbers=(res1, res2), universe=universe)
+            if results:
+                # unlike other contats, hbond results are a list as more than possible per pair.
+                for result in results:
+                    interaction_type = result.split(" ")[3]
+
+                    if found_interactions[interaction_type]:
+                        continue  # already a saltbridge describing this.
+
+                    interactions_found.append(result)
+                    found_interactions[interaction_type] = True
 
             if not found_interactions["sc-sc"]:
                 result = check_for_cation_pi(res_numbers=(res1, res2), universe=universe)
