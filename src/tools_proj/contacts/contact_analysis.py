@@ -18,7 +18,7 @@ import MDAnalysis
 from MDAnalysis import Universe
 from MDAnalysis.analysis import distances
 
-from tools_proj.contacts.salt_bridges import check_for_salt_bridge
+from tools_proj.contacts.salt_bridges import check_for_salt_bridge, check_for_c_term_salt_bridge
 
 # from tools_proj.contacts.hydrogen_bonds import check_for_hydrogen_bond # TODO
 from tools_proj.contacts.cation_pi import check_for_cation_pi
@@ -91,9 +91,7 @@ def single_frame_contact_analysis(
         start_time = time.monotonic()
 
     # important this is done on all atoms so indexing matches up.
-    ca_dist_matrix = distances.distance_array(
-        ca_atoms, ca_atoms, box=universe.dimensions
-    )
+    ca_dist_matrix = distances.distance_array(ca_atoms, ca_atoms, box=universe.dimensions)
     print("Sytem setup complete, identifying interactions now.")
 
     # identify all contacts in the frame.
@@ -146,9 +144,7 @@ def multi_frame_contact_analysis(
     all_interactions = []
     for _ in universe.trajectory:  # "_" is the current "timestep"
         # important this is done on all atoms so indexing matches up.
-        ca_dist_matrix = distances.distance_array(
-            ca_atoms, ca_atoms, box=universe.dimensions
-        )
+        ca_dist_matrix = distances.distance_array(ca_atoms, ca_atoms, box=universe.dimensions)
 
         # identify all contacts in the frame.
         per_frame_results = _process_single_frame(
@@ -198,6 +194,8 @@ def _process_single_frame(
         Formatting is as follows:
         [residue 1] [residue 2] [interaction type] [part(s) of residue involved]
     """
+    c_term_res_numbs = list(universe.select_atoms("name OXT").resids)
+
     interactions_found = []
     for res1 in range(start_res, final_res + 1):
         for res2 in range(res1, final_res + 1):
@@ -231,15 +229,22 @@ def _process_single_frame(
                 found_interactions["sc-sc"] = True
                 interactions_found.append(result)
 
+            if (res1 in c_term_res_numbs) or (res2 in c_term_res_numbs):
+                result = check_for_c_term_salt_bridge(
+                    res_numbers=(res1, res2), c_term_res_numbs=c_term_res_numbs, universe=universe
+                )
+                if result:
+                    interaction_type = result[3]  # mc-sc or sc-mc possible.
+                    found_interactions[interaction_type] = True
+                    interactions_found.append(result)
+
             # result = check_for_hydrogen_bond(res_numbers=(res1, res2), universe=universe)
             # TODO - will be a bit more challegning to define which interactions to find.
             # if result:
             #     interactions_found.append(result)
 
             if not found_interactions["sc-sc"]:
-                result = check_for_cation_pi(
-                    res_numbers=(res1, res2), universe=universe
-                )
+                result = check_for_cation_pi(res_numbers=(res1, res2), universe=universe)
                 if result:
                     found_interactions["sc-sc"] = True
                     interactions_found.append(result)
@@ -251,9 +256,7 @@ def _process_single_frame(
                     interactions_found.append(result)
 
             if not found_interactions["sc-sc"]:
-                result = check_for_hydrophobic(
-                    res_numbers=(res1, res2), universe=universe
-                )
+                result = check_for_hydrophobic(res_numbers=(res1, res2), universe=universe)
                 if result:
                     found_interactions["sc-sc"] = True
                     interactions_found.append(result)
@@ -264,9 +267,7 @@ def _process_single_frame(
             if any(list(found_interactions.values())):
                 continue  # no vdw_check required if any other type of interaction found.
 
-            result = check_for_vdw_interaction(
-                res_numbers=(res1, res2), universe=universe
-            )
+            result = check_for_vdw_interaction(res_numbers=(res1, res2), universe=universe)
             if result:
                 interactions_found.append(result)
 
@@ -353,10 +354,6 @@ def _format_multi_frame_results(all_interactions: list[list[str]]) -> pd.DataFra
         Dataframe with columns being each unique interaction.
         Rows correspond to each frame in the trajectory,
         with 1 = interaction present, 0 = not present.
-
-
-
-    TODO - optional param to merge at residue level? - or seperate function?
     """
     unique_interactions = []
     for frame in all_interactions:
