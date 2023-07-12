@@ -194,10 +194,11 @@ def _process_single_frame(
         [residue 1] [residue 2] [interaction type] [part(s) of residue involved]
     """
     c_term_res_numbs = list(universe.select_atoms("name OXT").resids)
+    biggest_res = max(universe.select_atoms("name CA").resids)
 
     interactions_found = []
     for res1 in range(start_res, final_res + 1):
-        for res2 in range(res1, final_res + 1):
+        for res2 in range(res1, biggest_res + 1):
             try:
                 ca_ca_dist = ca_dist_matrix[res1 - 1, res2 - 1]  # 0-indexed
             except IndexError as error:
