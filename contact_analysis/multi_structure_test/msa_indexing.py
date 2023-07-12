@@ -35,12 +35,15 @@ def parse_fasta(file_path):
     return sequences
 
 
-def indexing_pdb_to_msa(msa_sequence: list[str], df: pd.DataFrame) -> pd.DataFrame:
-    """This funciton takes in the msa sequence and a string of the two columns
-    of the output file and returns two new idecies"""
+def indexing_pdb_to_msa(
+    msa_sequence: list[str], df_input: pd.DataFrame
+) -> pd.DataFrame:
+    """This funciton takes in the msa sequence and a dataframe of the
+    pdb contact analysis output, updates original dataframe with the new
+    columns that contain msa indexing and returns it"""
 
-    res1_list = list(df["Res1"])
-    res2_list = list(df["Res2"])
+    res1_list = list(df_input["Res1"])
+    res2_list = list(df_input["Res2"])
     counter = 0.0
     index_pdb_msa = {}
     msa_indx_res1 = []
@@ -61,9 +64,9 @@ def indexing_pdb_to_msa(msa_sequence: list[str], df: pd.DataFrame) -> pd.DataFra
         msa_indx_res1.append(index_pdb_msa[int(pdb_indx_res1)])
         msa_indx_res2.append(index_pdb_msa[int(pdb_indx_res2)])
 
-    df["Res1_msa"] = msa_indx_res1
-    df["Res2_msa"] = msa_indx_res2
-    return df
+    df_input["Res1_msa"] = msa_indx_res1
+    df_input["Res2_msa"] = msa_indx_res2
+    return df_input
 
 
 sequence_dict = parse_fasta(MSA_SEQUENCES_FILE)
