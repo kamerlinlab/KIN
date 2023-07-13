@@ -18,16 +18,19 @@ import MDAnalysis
 from MDAnalysis import Universe
 from MDAnalysis.analysis import distances
 
-from tools_proj.contacts.salt_bridges import check_for_salt_bridge, check_for_c_term_salt_bridge
+from tools_proj.contacts.salt_bridges import (
+    check_for_salt_bridge,
+    check_for_c_term_salt_bridge,
+)
 from tools_proj.contacts.hbonds import check_for_hbond
 from tools_proj.contacts.cation_pi import check_for_cation_pi
 from tools_proj.contacts.pi_pi import check_for_pi_pi
 from tools_proj.contacts.hydrophobic import check_for_hydrophobic
 from tools_proj.contacts.van_der_waals import check_for_vdw_interaction
 
-# the largest heavy atom distance possible for an interaction to be considered.
-# comes from pi-pi.
-MAX_DIST = 7.2
+# Used to prefilter residue pairs.
+MAX_CA_DIST = 20
+MAX_HEAVY_DIST = 6  # High so can still find pi-pi interactions.
 
 
 def single_frame_contact_analysis(
@@ -83,29 +86,24 @@ def single_frame_contact_analysis(
     TODO
 
     """
-    universe, start_res, final_res, ca_atoms = _prep_system(
+    if report_time_taken:
+        start_time = time.monotonic()
+
+    universe, start_res, final_res = _prep_system(
         coords_file=coordinates_file,
         topology_file=topology_file,
         first_res=first_res,
         last_res=last_res,
     )
 
-    if report_time_taken:
-        start_time = time.monotonic()
+    res_pairs = _pre_filter_res_pairs(
+        start_res=start_res, final_res=final_res, universe=universe
+    )
 
-    # important this is done on all atoms so indexing matches up.
-    ca_dist_matrix = distances.distance_array(ca_atoms, ca_atoms, box=universe.dimensions)
-    heavy_atom_matrix = _min_heavy_atom_distances(universe=universe)  # TODO
     print("Sytem setup complete, identifying interactions now.")
 
     # identify all contacts in the frame.
-    contacts_found = _process_single_frame(
-        universe=universe,
-        start_res=start_res,
-        final_res=final_res,
-        ca_dist_matrix=ca_dist_matrix,
-        heavy_atom_matrix=heavy_atom_matrix,
-    )
+    contacts_found = _process_single_frame(universe=universe, res_pairs=res_pairs)
 
     with open(out_file, "w", encoding="utf-8") as tfile:
         tfile.write("Res1 Res2 Interaction_Type Residue_Parts \n")
@@ -135,32 +133,27 @@ def multi_frame_contact_analysis(
 
 
     """
-    universe, start_res, final_res, ca_atoms = _prep_system(
+    if report_time_taken:
+        start_time = time.monotonic()
+
+    universe, start_res, final_res = _prep_system(
         coords_file=trajectory_file,
         topology_file=topology_file,
         first_res=first_res,
         last_res=last_res,
     )
 
-    if report_time_taken:
-        start_time = time.monotonic()
-    print("Setup complete, identifying interactions now.")
+    print("Sytem setup complete, identifying interactions now.")
 
     all_interactions = []
     for _ in universe.trajectory:  # "_" is the current "timestep"
-        # important this is done on all atoms so indexing matches up.
-        ca_dist_matrix = distances.distance_array(ca_atoms, ca_atoms, box=universe.dimensions)
-        heavy_atom_matrix = _min_heavy_atom_distances(universe=universe)
-
+        res_pairs = _pre_filter_res_pairs(
+            start_res=start_res, final_res=final_res, universe=universe
+        )
         # identify all contacts in the frame.
         per_frame_results = _process_single_frame(
-            universe=universe,
-            start_res=start_res,
-            final_res=final_res,
-            ca_dist_matrix=ca_dist_matrix,
-            heavy_atom_matrix=heavy_atom_matrix,
+            universe=universe, res_pairs=res_pairs
         )
-
         all_interactions.append(per_frame_results)
 
     if report_time_taken:
@@ -174,11 +167,7 @@ def multi_frame_contact_analysis(
 
 
 def _process_single_frame(
-    universe: Universe,
-    start_res: int,
-    final_res: int,
-    ca_dist_matrix: np.ndarray,
-    heavy_atom_matrix: np.ndarray,
+    universe: Universe, res_pairs: list[tuple[int, int]]
 ) -> list[str]:
     """
     The main logic to analyse a single structure/frame.
@@ -188,17 +177,8 @@ def _process_single_frame(
     universe: Universe
         MDAnalysis universe object.
 
-    start_res: int
-        First residue to analyse.
-
-    final_res: int
-        Last residue to analyse
-
-    ca_dist_matrix: np.ndarray
-        Distance matrix between all Calpha atoms.
-        Matrix size is [Number of residues x number of residues].
-
-    TODO
+    res_pairs: list[tuple[int, int]]
+        list of residue pairs to analyse.
 
     Returns
     -------
@@ -208,102 +188,73 @@ def _process_single_frame(
         [residue 1] [residue 2] [interaction type] [part(s) of residue involved]
     """
     c_term_res_numbs = list(universe.select_atoms("name OXT").resids)
-    biggest_res = max(universe.select_atoms("name CA").resids)
-
     interactions_found = []
-    count_pre_reject = 0
-    count_post_reject = 0
-    for res1 in range(start_res, final_res + 1):
-        for res2 in range(res1, biggest_res + 1):
-            try:
-                # TODO
-                ca_ca_dist = ca_dist_matrix[res1 - 1, res2 - 1]  # 0-indexed
-                heavy_atom_dist = heavy_atom_matrix[res1 - 1, res2 - 1]  # 0-indexed
-            except IndexError as error:
-                ca_atoms = universe.select_atoms("name CA")
-                last_res_numb = max(ca_atoms.resids)
-                specific_message = f"""
-                It seems like you stated you have more residues than you actually have.
-                The last residue I found in your input file(s) is: {last_res_numb}.
-                Tip, don't provide the parameter "last_res" if you just want to analyse all residues.
-                """
-                raise RuntimeError(specific_message) from error
+    for res1, res2 in res_pairs:
+        # keeps track of interactions found for current residue pair and timestep.
+        found_interactions = {
+            "mc-mc": False,
+            "sc-mc": False,
+            "mc-sc": False,
+            "sc-sc": False,
+        }
 
-            # two quick tests to filter out interactions.
-            if (res1 == res2) or ca_ca_dist > 20:
-                continue
-            count_pre_reject += 1
+        # Now begin searching for interactions.
+        result = check_for_salt_bridge(res_numbers=(res1, res2), universe=universe)
+        if result:
+            found_interactions["sc-sc"] = True
+            interactions_found.append(result)
 
-            # TODO... testing...
-            if heavy_atom_dist > MAX_DIST:
-                continue
-            count_post_reject += 1
+        if (res1 in c_term_res_numbs) or (res2 in c_term_res_numbs):
+            result = check_for_c_term_salt_bridge(
+                res_numbers=(res1, res2),
+                c_term_res_numbs=c_term_res_numbs,
+                universe=universe,
+            )
+            if result:
+                interaction_type = result.split(" ")[3]  # mc-sc or sc-mc possible.
+                found_interactions[interaction_type] = True
+                interactions_found.append(result)
 
-            # keeps track of interactions found for current residue pair and timestep.
-            found_interactions = {
-                "mc-mc": False,
-                "sc-mc": False,
-                "mc-sc": False,
-                "sc-sc": False,
-            }
+        results = check_for_hbond(res_numbers=(res1, res2), universe=universe)
+        if results:
+            # unlike other contats, hbond results are a list as more than possible per pair.
+            for result in results:
+                interaction_type = result.split(" ")[3]
 
-            # Now begin searching for interactions.
-            result = check_for_salt_bridge(res_numbers=(res1, res2), universe=universe)
+                if found_interactions[interaction_type]:
+                    continue  # already a saltbridge describing this.
+
+                interactions_found.append(result)
+                found_interactions[interaction_type] = True
+
+        if not found_interactions["sc-sc"]:
+            result = check_for_cation_pi(res_numbers=(res1, res2), universe=universe)
             if result:
                 found_interactions["sc-sc"] = True
                 interactions_found.append(result)
 
-            if (res1 in c_term_res_numbs) or (res2 in c_term_res_numbs):
-                result = check_for_c_term_salt_bridge(
-                    res_numbers=(res1, res2), c_term_res_numbs=c_term_res_numbs, universe=universe
-                )
-                if result:
-                    interaction_type = result.split(" ")[3]  # mc-sc or sc-mc possible.
-                    found_interactions[interaction_type] = True
-                    interactions_found.append(result)
-
-            results = check_for_hbond(res_numbers=(res1, res2), universe=universe)
-            if results:
-                # unlike other contats, hbond results are a list as more than possible per pair.
-                for result in results:
-                    interaction_type = result.split(" ")[3]
-
-                    if found_interactions[interaction_type]:
-                        continue  # already a saltbridge describing this.
-
-                    interactions_found.append(result)
-                    found_interactions[interaction_type] = True
-
-            if not found_interactions["sc-sc"]:
-                result = check_for_cation_pi(res_numbers=(res1, res2), universe=universe)
-                if result:
-                    found_interactions["sc-sc"] = True
-                    interactions_found.append(result)
-
-            if not found_interactions["sc-sc"]:
-                result = check_for_pi_pi(res_numbers=(res1, res2), universe=universe)
-                if result:
-                    found_interactions["sc-sc"] = True
-                    interactions_found.append(result)
-
-            if not found_interactions["sc-sc"]:
-                result = check_for_hydrophobic(res_numbers=(res1, res2), universe=universe)
-                if result:
-                    found_interactions["sc-sc"] = True
-                    interactions_found.append(result)
-
-            if abs(res1 - res2) <= 3:
-                continue  # residues too close in sequence to be interesting...
-
-            if any(list(found_interactions.values())):
-                continue  # no vdw_check required if any other type of interaction found.
-
-            result = check_for_vdw_interaction(res_numbers=(res1, res2), universe=universe)
+        if not found_interactions["sc-sc"]:
+            result = check_for_pi_pi(res_numbers=(res1, res2), universe=universe)
             if result:
+                found_interactions["sc-sc"] = True
                 interactions_found.append(result)
 
-    print(f"{count_pre_reject=}")
-    print(f"{count_post_reject=}")
+        if not found_interactions["sc-sc"]:
+            result = check_for_hydrophobic(res_numbers=(res1, res2), universe=universe)
+            if result:
+                found_interactions["sc-sc"] = True
+                interactions_found.append(result)
+
+        if abs(res1 - res2) <= 3:
+            continue  # residues too close in sequence to be interesting...
+
+        if any(list(found_interactions.values())):
+            continue  # no vdw_check required if any other type of interaction found.
+
+        result = check_for_vdw_interaction(res_numbers=(res1, res2), universe=universe)
+        if result:
+            interactions_found.append(result)
+
     return interactions_found
 
 
@@ -312,7 +263,7 @@ def _prep_system(
     topology_file: Optional[str] = None,
     first_res: Optional[int] = None,
     last_res: Optional[int] = None,
-) -> tuple[Universe, int, int, MDAnalysis.core.groups.AtomGroup]:
+) -> tuple[Universe, int, int]:
     """
     Handles the setup of single or multi-frame trajectory analysis.
 
@@ -343,9 +294,6 @@ def _prep_system(
 
     final_res: int
         Last residue to analyse
-
-    ca_atoms: MDAnalysis.core.groups.AtomGroup
-        MDAnalysis selection of all Calpha atoms present in structure.
     """
 
     # not required for any of the tasks below.
@@ -366,7 +314,72 @@ def _prep_system(
     else:
         final_res = last_res
 
-    return universe, start_res, final_res, ca_atoms
+    return universe, start_res, final_res
+
+
+def _pre_filter_res_pairs(
+    start_res: int, final_res: int, universe: Universe
+) -> list[tuple[int, int]]:
+    """
+    Pre filter all possible residue pairs using first the CA-CA distances
+    and then the heavy atom distances. This helps massively reduce the number of potential
+    interacting pairs to investiage. Particularly useful for a large system.
+
+    Parameters
+    ----------
+    start_res: int
+        first residue to analyse.
+
+    final_res: int
+        final residue to analyse
+
+    universe: Universe
+        MDAnalysis universe object.
+
+    Returns
+    -------
+    list[tuple[int, int]]
+        List of residue pairs whose contacts should be analysed.
+    """
+    ca_atoms = universe.select_atoms("name CA")
+    biggest_res = max(universe.select_atoms("name CA").resids)
+    ca_dist_matrix = distances.distance_array(
+        ca_atoms, ca_atoms, box=universe.dimensions
+    )
+
+    res_pairs = []
+    for res1 in range(start_res, final_res + 1):
+        for res2 in range(res1 + 1, biggest_res + 1):
+            try:
+                ca_ca_dist = ca_dist_matrix[res1 - 1, res2 - 1]  # 0-indexed
+            except IndexError as error:
+                ca_atoms = universe.select_atoms("name CA")
+                last_res_numb = max(ca_atoms.resids)
+                specific_message = f"""
+                It seems like you stated you have more residues than you actually have.
+                The last residue I found in your input file(s) is: {last_res_numb}.
+                Tip, don't provide the parameter "last_res" if you just want to analyse all residues.
+                """
+                raise RuntimeError(specific_message) from error
+
+            if ca_ca_dist > MAX_CA_DIST:
+                continue
+
+            # now check min heavy atom distance.
+            res1_str = "resid " + str(res1) + " and not name H* "
+            res2_str = "resid " + str(res2) + " and not name H* "
+            res1_atoms = universe.select_atoms(res1_str)
+            res2_atoms = universe.select_atoms(res2_str)
+            min_heavy_dist = (
+                distances.distance_array(
+                    res1_atoms.positions, res2_atoms.positions, box=universe.dimensions
+                )
+            ).min()
+
+            if min_heavy_dist < MAX_HEAVY_DIST:
+                res_pairs.append((res1, res2))
+
+    return res_pairs
 
 
 def _format_multi_frame_results(all_interactions: list[list[str]]) -> pd.DataFrame:
@@ -410,33 +423,3 @@ def _format_multi_frame_results(all_interactions: list[list[str]]) -> pd.DataFra
                 per_frame_results[interaction].append(0)
 
     return pd.DataFrame(per_frame_results)
-
-
-def _min_heavy_atom_distances(
-    universe: Universe,
-) -> np.ndarray:
-    """
-    Calc the minimum heavy atom distances between all residues.
-    """
-    ca_atoms = universe.select_atoms("name CA")
-    first_res = min(ca_atoms.resids)
-    last_res = max(ca_atoms.resids)
-
-    matrix_size = (last_res - first_res) + 1
-    heavy_atom_matrix = np.zeros((matrix_size, matrix_size), dtype=int)
-
-    for group1_idx in range(first_res, last_res + 1):
-        group1_selection = "resid " + str(group1_idx) + " and not name H* "
-        res1 = universe.select_atoms(group1_selection)
-
-        for group2_idx in range(group1_idx, last_res + 1):
-            group2_selection = "resid " + str(group2_idx) + " and not name H* "
-            res2 = universe.select_atoms(group2_selection)
-
-            # Calc and update matrix with min dist
-            dist_arr = distances.distance_array(res1.positions, res2.positions, box=universe.dimensions)
-            min_dist = dist_arr.min()
-            heavy_atom_matrix[(group1_idx - 1), (group2_idx - 1)] = min_dist
-            heavy_atom_matrix[(group2_idx - 1), (group1_idx - 1)] = min_dist
-
-    return heavy_atom_matrix
