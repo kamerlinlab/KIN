@@ -25,6 +25,10 @@ from tools_proj.contacts.pi_pi import check_for_pi_pi
 from tools_proj.contacts.hydrophobic import check_for_hydrophobic
 from tools_proj.contacts.van_der_waals import check_for_vdw_interaction
 
+# the largest heavy atom distance possible for an interaction to be considered.
+# comes from pi-pi.
+MAX_DIST = 7.2
+
 
 def single_frame_contact_analysis(
     out_file: str,
@@ -91,6 +95,7 @@ def single_frame_contact_analysis(
 
     # important this is done on all atoms so indexing matches up.
     ca_dist_matrix = distances.distance_array(ca_atoms, ca_atoms, box=universe.dimensions)
+    heavy_atom_matrix = _min_heavy_atom_distances(universe=universe)  # TODO
     print("Sytem setup complete, identifying interactions now.")
 
     # identify all contacts in the frame.
@@ -99,6 +104,7 @@ def single_frame_contact_analysis(
         start_res=start_res,
         final_res=final_res,
         ca_dist_matrix=ca_dist_matrix,
+        heavy_atom_matrix=heavy_atom_matrix,
     )
 
     with open(out_file, "w", encoding="utf-8") as tfile:
@@ -144,6 +150,7 @@ def multi_frame_contact_analysis(
     for _ in universe.trajectory:  # "_" is the current "timestep"
         # important this is done on all atoms so indexing matches up.
         ca_dist_matrix = distances.distance_array(ca_atoms, ca_atoms, box=universe.dimensions)
+        heavy_atom_matrix = _min_heavy_atom_distances(universe=universe)
 
         # identify all contacts in the frame.
         per_frame_results = _process_single_frame(
@@ -151,6 +158,7 @@ def multi_frame_contact_analysis(
             start_res=start_res,
             final_res=final_res,
             ca_dist_matrix=ca_dist_matrix,
+            heavy_atom_matrix=heavy_atom_matrix,
         )
 
         all_interactions.append(per_frame_results)
@@ -166,7 +174,11 @@ def multi_frame_contact_analysis(
 
 
 def _process_single_frame(
-    universe: Universe, start_res: int, final_res: int, ca_dist_matrix: np.ndarray
+    universe: Universe,
+    start_res: int,
+    final_res: int,
+    ca_dist_matrix: np.ndarray,
+    heavy_atom_matrix: np.ndarray,
 ) -> list[str]:
     """
     The main logic to analyse a single structure/frame.
@@ -186,6 +198,8 @@ def _process_single_frame(
         Distance matrix between all Calpha atoms.
         Matrix size is [Number of residues x number of residues].
 
+    TODO
+
     Returns
     -------
     list[str]
@@ -197,10 +211,14 @@ def _process_single_frame(
     biggest_res = max(universe.select_atoms("name CA").resids)
 
     interactions_found = []
+    count_pre_reject = 0
+    count_post_reject = 0
     for res1 in range(start_res, final_res + 1):
         for res2 in range(res1, biggest_res + 1):
             try:
+                # TODO
                 ca_ca_dist = ca_dist_matrix[res1 - 1, res2 - 1]  # 0-indexed
+                heavy_atom_dist = heavy_atom_matrix[res1 - 1, res2 - 1]  # 0-indexed
             except IndexError as error:
                 ca_atoms = universe.select_atoms("name CA")
                 last_res_numb = max(ca_atoms.resids)
@@ -214,6 +232,12 @@ def _process_single_frame(
             # two quick tests to filter out interactions.
             if (res1 == res2) or ca_ca_dist > 20:
                 continue
+            count_pre_reject += 1
+
+            # TODO... testing...
+            if heavy_atom_dist > MAX_DIST:
+                continue
+            count_post_reject += 1
 
             # keeps track of interactions found for current residue pair and timestep.
             found_interactions = {
@@ -278,6 +302,8 @@ def _process_single_frame(
             if result:
                 interactions_found.append(result)
 
+    print(f"{count_pre_reject=}")
+    print(f"{count_post_reject=}")
     return interactions_found
 
 
@@ -384,3 +410,33 @@ def _format_multi_frame_results(all_interactions: list[list[str]]) -> pd.DataFra
                 per_frame_results[interaction].append(0)
 
     return pd.DataFrame(per_frame_results)
+
+
+def _min_heavy_atom_distances(
+    universe: Universe,
+) -> np.ndarray:
+    """
+    Calc the minimum heavy atom distances between all residues.
+    """
+    ca_atoms = universe.select_atoms("name CA")
+    first_res = min(ca_atoms.resids)
+    last_res = max(ca_atoms.resids)
+
+    matrix_size = (last_res - first_res) + 1
+    heavy_atom_matrix = np.zeros((matrix_size, matrix_size), dtype=int)
+
+    for group1_idx in range(first_res, last_res + 1):
+        group1_selection = "resid " + str(group1_idx) + " and not name H* "
+        res1 = universe.select_atoms(group1_selection)
+
+        for group2_idx in range(group1_idx, last_res + 1):
+            group2_selection = "resid " + str(group2_idx) + " and not name H* "
+            res2 = universe.select_atoms(group2_selection)
+
+            # Calc and update matrix with min dist
+            dist_arr = distances.distance_array(res1.positions, res2.positions, box=universe.dimensions)
+            min_dist = dist_arr.min()
+            heavy_atom_matrix[(group1_idx - 1), (group2_idx - 1)] = min_dist
+            heavy_atom_matrix[(group2_idx - 1), (group1_idx - 1)] = min_dist
+
+    return heavy_atom_matrix
