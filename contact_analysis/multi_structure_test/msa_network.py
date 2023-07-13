@@ -19,13 +19,13 @@ network_files = glob.glob(
     "/Users/dariiayehorova/lk_research/tools/tools-project/contact_analysis/multi_structure_test/network_output/*.csv"
 )
 msa_columns = ["Res1_msa", "Res2_msa"]
-STRUCTURE_COUNT = 0
-INTERACTION_COUNT = 0
+structure_count = 0
+interaction_count = 0
 THRESHOLD = 1.0
 
 
 for file_path in msa_df_files:
-    STRUCTURE_COUNT += 1
+    structure_count += 1
     df = pd.read_csv(file_path)
     df_filter = df[msa_columns]
     filtered_dfs.append(df_filter)
@@ -42,18 +42,18 @@ res1_selected = []
 res2_selected = []
 
 for pair, count in pair_counts.items():
-    if count / STRUCTURE_COUNT >= THRESHOLD:
-        INTERACTION_COUNT += 1
+    if count / structure_count >= THRESHOLD:
+        interaction_count += 1
         res1_selected.append(pair[0])
         res2_selected.append(pair[1])
 selected_contacts["Res1_msa"] = res1_selected
 selected_contacts["Res2_msa"] = res2_selected
 
 print(
-    f"There are {INTERACTION_COUNT} interactions that occur in the {THRESHOLD*100}% of structures"
+    f"There are {interaction_count} interactions that occur in the {THRESHOLD*100}% of structures"
 )
-print(f"Total number of structures:{STRUCTURE_COUNT}")
-print(f"This interaction occure in {STRUCTURE_COUNT*THRESHOLD} structures")
+print(f"Total number of structures:{structure_count}")
+print(f"This interaction occure in {structure_count*THRESHOLD} structures")
 
 # Compare to the interactions of the TEM-1 and reduce the network only to
 # the types of interactions present in TEM-1
