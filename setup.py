@@ -22,6 +22,9 @@ setup(
         "plotly",  # TODO - maybe remove, only for making figures.
         # TODO - add more.
     ],
+    extras_require={
+        "dev": ["pytest", "black"],
+    },
     python_requires=">=3.10",
     classifiers=[
         "Programming Language :: Python :: 3",
