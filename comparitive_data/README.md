@@ -16,3 +16,10 @@ and the extracted per residue fitness scores (per_res_fitness_scores.json).
 We used the program plmc to determine inferred coupling strengths between all pairs of positions.
 plmc is a program written in C available from GitHub at: https://github.com/debbiemarkslab/plmc
 The paper describing the software/method is: https://www.nature.com/articles/nbt.3769
+
+
+#### msa_scores
+Multiple sequence alingment??? scores for the 69 proteins used in this dataset.
+The multiple sequence alingment was scored using the Clustal Omega webserver.
+The alingment file provided to the webserver is: ""
+The results file generated is:
