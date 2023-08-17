@@ -11,6 +11,8 @@ from typing import Optional
 import warnings
 import time
 from datetime import timedelta
+
+from multiprocessing import Pool
 import numpy as np
 import pandas as pd
 from MDAnalysis import Universe
@@ -124,6 +126,7 @@ def multi_frame_contact_analysis(
     topology_file: Optional[str] = None,
     first_res: Optional[int] = None,
     last_res: Optional[int] = None,
+    num_processes: Optional[int] = None,
     report_time_taken: bool = True,
 ) -> pd.DataFrame:
     """
@@ -154,6 +157,12 @@ def multi_frame_contact_analysis(
         Can be useful if you want to break the analysis into blocks and combine later.
         If not provided, the last residue in the trajectory will be used.
 
+    num_processes: Optional[int] = None
+        Frames are analysed in parallel by default. You can optionally define how many frames
+        to analyse in parallel with this parameter. If not provided (recommended), the
+        code will use as many parallel processes as you have cores. You most likely
+        only need to play with this parameter if you are getting out of memory issues.
+
     report_time_taken: bool
         Choose whether to print to the console how long the calculation took to run.
         Optional, default is True.
@@ -177,16 +186,17 @@ def multi_frame_contact_analysis(
 
     print("Sytem setup complete, identifying interactions now.")
 
+    # generate tuple of everything needed to run in parralel.
+    trajectory_steps = []
+    for frame in range(0, len(universe.trajectory)):
+        trajectory_steps.append((start_res, final_res, frame, universe))
+
     all_interactions = []
-    for _ in universe.trajectory:  # "_" is the current "timestep"
-        res_pairs = _pre_filter_res_pairs(
-            start_res=start_res, final_res=final_res, universe=universe
-        )
-        # identify all contacts in the frame.
-        per_frame_results = _process_single_frame(
-            universe=universe, res_pairs=res_pairs
-        )
-        all_interactions.append(per_frame_results)
+    with Pool(processes=num_processes) as pool:
+        results = pool.imap(_pooling_function, iterable=trajectory_steps)
+
+        for per_frame_results in results:
+            all_interactions.append(per_frame_results)
 
     if report_time_taken:
         end_time = time.monotonic()
@@ -194,8 +204,38 @@ def multi_frame_contact_analysis(
         print(f"Time taken: {delta_time}")
 
     results_df = _format_multi_frame_results(all_interactions)
-    results_df.to_csv(out_file)
+    results_df.to_csv(out_file, index=False)
     return results_df
+
+
+def _pooling_function(args: tuple[int, int, int, Universe]) -> list[str]:
+    """
+    Pooling function used in multiframe analysis. Enables analysis of multiple
+    trajectory frames at once.
+
+    Parameters
+    ----------
+    args: tuple[int, int, int, Universe]
+        The arguments needed for each seperate process run using multiprocessing.
+        This requires 4 items provided as a tuple:
+        start_res, final_res, timestep, universe.
+
+    Returns
+    -------
+    list[str]
+        Each item is a string describing a contact identified.
+        Formatting is as follows:
+        [residue 1] [residue 2] [interaction type] [part(s) of residue involved]
+    """
+    start_res, final_res, timestep, universe = args
+    universe.trajectory[timestep]  # set the universe to the correct timestep.
+
+    res_pairs = _pre_filter_res_pairs(
+        start_res=start_res, final_res=final_res, universe=universe
+    )
+    per_frame_results = _process_single_frame(universe=universe, res_pairs=res_pairs)
+
+    return per_frame_results
 
 
 def _process_single_frame(

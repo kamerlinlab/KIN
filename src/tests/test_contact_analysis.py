@@ -107,9 +107,28 @@ def test_multi_frame_pdb():
     """
     Test a 5 frame pdb gives expected result.
     """
+
     trajectory_file_path = str(TEST_DATA_DIR / TEST_FILES["pdb_traject"])
 
     result = multi_frame_contact_analysis(
+        trajectory_file=trajectory_file_path,
+        out_file="tmp.tmp",
+        first_res=1,
+        last_res=20,
+    )
+
+    assert result.shape == (5, 157)
+
+
+def test_amber_traject():
+    """
+    Test a 5 frame trajectory gives expected result.
+    """
+    topology_file_path = str(TEST_DATA_DIR / TEST_FILES["amber_topology"])
+    trajectory_file_path = str(TEST_DATA_DIR / TEST_FILES["amber_traject"])
+
+    result = multi_frame_contact_analysis(
+        topology_file=topology_file_path,
         trajectory_file=trajectory_file_path,
         out_file="tmp.tmp",
         first_res=1,
