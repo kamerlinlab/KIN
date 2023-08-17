@@ -11,10 +11,8 @@ from typing import Optional
 import warnings
 import time
 from datetime import timedelta
-
 import numpy as np
 import pandas as pd
-import MDAnalysis
 from MDAnalysis import Universe
 from MDAnalysis.analysis import distances
 
@@ -355,9 +353,9 @@ def _pre_filter_res_pairs(
     start_res: int, final_res: int, universe: Universe
 ) -> list[tuple[int, int]]:
     """
-    Pre filter all possible residue pairs using first the CA-CA distances
-    and then the heavy atom distances. This helps massively reduce the number of potential
-    interacting pairs to investiage. Particularly useful for a large system.
+    Pre filter all possible residue pairs using the heavy atom distances.
+    This helps massively reduce the number of potential interacting pairs to investigate.
+    Particularly useful for a large system.
 
     Parameters
     ----------
@@ -376,41 +374,30 @@ def _pre_filter_res_pairs(
         List of residue pairs whose contacts should be analysed.
     """
     ca_atoms = universe.select_atoms("name CA")
-    biggest_res = max(universe.select_atoms("name CA").resids)
-    ca_dist_matrix = distances.distance_array(
-        ca_atoms, ca_atoms, box=universe.dimensions
+    biggest_res = max(ca_atoms.resids)
+
+    all_heavy_atoms_sele = "not name H* and resid 1" + "-" + str(biggest_res)
+    all_heavy_atoms = universe.select_atoms(all_heavy_atoms_sele)
+
+    # determine which residue each heavy atom belongs to.
+    residue_ranges = {}
+    for res_numb in range(1, biggest_res + 1):
+        residue_range = np.where(all_heavy_atoms.atoms.resids == res_numb)
+        residue_ranges[res_numb] = residue_range
+
+    heavy_atom_dists = distances.distance_array(
+        all_heavy_atoms.positions,
+        all_heavy_atoms.positions,
     )
 
     res_pairs = []
     for res1 in range(start_res, final_res + 1):
+        res_dists = heavy_atom_dists[residue_ranges[res1]]
+
         for res2 in range(res1 + 1, biggest_res + 1):
-            try:
-                ca_ca_dist = ca_dist_matrix[res1 - 1, res2 - 1]  # 0-indexed
-            except IndexError as error:
-                ca_atoms = universe.select_atoms("name CA")
-                last_res_numb = max(ca_atoms.resids)
-                specific_message = f"""
-                It seems like you stated you have more residues than you actually have.
-                The last residue I found in your input file(s) is: {last_res_numb}.
-                Tip, don't provide the parameter "last_res" if you just want to analyse all residues.
-                """
-                raise RuntimeError(specific_message) from error
+            res_res_dists = res_dists[:, residue_ranges[res2]]
 
-            if ca_ca_dist > MAX_CA_DIST:
-                continue
-
-            # now check min heavy atom distance.
-            res1_str = "resid " + str(res1) + " and not name H* "
-            res2_str = "resid " + str(res2) + " and not name H* "
-            res1_atoms = universe.select_atoms(res1_str)
-            res2_atoms = universe.select_atoms(res2_str)
-            min_heavy_dist = (
-                distances.distance_array(
-                    res1_atoms.positions, res2_atoms.positions, box=universe.dimensions
-                )
-            ).min()
-
-            if min_heavy_dist < MAX_HEAVY_DIST:
+            if res_res_dists.min() <= MAX_HEAVY_DIST:
                 res_pairs.append((res1, res2))
 
     return res_pairs
