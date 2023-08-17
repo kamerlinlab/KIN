@@ -13,13 +13,14 @@ and the extracted per residue fitness scores (per_res_fitness_scores.json).
 
 
 #### coupling_strengths_data
-We used the program plmc to determine inferred coupling strengths between all pairs of positions.
-plmc is a program written in C available from GitHub at: https://github.com/debbiemarkslab/plmc
-The paper describing the software/method is: https://www.nature.com/articles/nbt.3769
+We used the ev couplings webserver (https://v2.evcouplings.org/) to determine inferred coupling strengths between residue pairs for the target protein TEM1.
+
+The recommended result was taken forward which had a bitscore of 0.5 and quality score of 10/10.
+The file provided by the webserver "couplings/TARGET_b0.5_CouplingScores.csv" was downloaded and is saved here without modification.
 
 
-#### msa_scores
-Multiple sequence alingment??? scores for the 69 proteins used in this dataset.
-The multiple sequence alingment was scored using the Clustal Omega webserver.
-The alingment file provided to the webserver is: ""
-The results file generated is:
+#### percentage_id_matrix
+The percentage identity matrix for the 69 proteins used in this dataset was generated using the Clustal Omega webserver (https://www.ebi.ac.uk/Tools/msa/clustalo/).
+The alingment file provided to the webserver is: "all_sequences.txt".
+The default settings were used.
+The percent identiy matrix was downloaded as is and is saved as in the file: "percent_identity_matrix.txt"
