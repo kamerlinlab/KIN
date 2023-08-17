@@ -40,7 +40,7 @@ def single_frame_contact_analysis(
     first_res: Optional[int] = None,
     last_res: Optional[int] = None,
     report_time_taken: bool = True,
-):
+) -> list[str]:
     """
     Identify all contacts present in a single structure.
     If you have multiple frames to analyse,
@@ -83,8 +83,10 @@ def single_frame_contact_analysis(
 
     Returns
     -------
-    TODO
-
+    list[str]
+        Each item is a string describing a contact identified.
+        Formatting is as follows:
+        [residue 1] [residue 2] [interaction type] [part(s) of residue involved]
     """
     if report_time_taken:
         start_time = time.monotonic()
@@ -125,13 +127,45 @@ def multi_frame_contact_analysis(
     first_res: Optional[int] = None,
     last_res: Optional[int] = None,
     report_time_taken: bool = True,
-):
+) -> pd.DataFrame:
     """
     Identify all contacts present in a trajectory file.
     If you have only a single frame to analyse,
     use the function: "single_frame_contact_analysis" instead.
 
+    Parameters
+    ----------
+    out_file: str
+        File path to write the results to.
 
+    coordinates_file: str,
+        File path to the trajectory_file.
+        Needs to be a file type supported by MDAnalysis (most standard).
+
+    topology_file: Optional[str]
+        Depending on the file type of the trajectory, this may not be required.
+        For example if using a pdb file as the coordinates_file.
+
+    first_res: Optional[int]
+        First residue to analyse.
+        Can be useful if you want to break the analysis into blocks and combine later.
+        If not provided, the first residue in the trajectory will be used.
+
+    last_res: Optional[int]
+        Last residue to analyse
+        Can be useful if you want to break the analysis into blocks and combine later.
+        If not provided, the last residue in the trajectory will be used.
+
+    report_time_taken: bool
+        Choose whether to print to the console how long the calculation took to run.
+        Optional, default is True.
+
+    Returns
+    -------
+    pd.DataFrame
+        Pandas dataframe with each column a different contact identified.
+        Each row is a frame in the trajectory and has a value of either 1 or 0
+        depending on whether the contact was observed in the specific frame (1=yes) or not.
     """
     if report_time_taken:
         start_time = time.monotonic()
@@ -217,7 +251,7 @@ def _process_single_frame(
 
         results = check_for_hbond(res_numbers=(res1, res2), universe=universe)
         if results:
-            # unlike other contats, hbond results are a list as more than possible per pair.
+            # unlike other contats, hbond results are a list as more than 1 possible per pair.
             for result in results:
                 interaction_type = result.split(" ")[3]
 
