@@ -87,9 +87,9 @@ def indexing_pdb_to_msa(
     df_input = df_input[new_order]
     # Make a df column with all missing residues and the rest of them fill in with Nan
     missing_indicies_index = range(len(missing_indicies))
-    df_input["Missing_msa_res"] = np.nan
-    df_input.loc[missing_indicies_index, "Missing_msa_res"] = missing_indicies
-    df_input["Missing_msa_res"] = df_input["Missing_msa_res"].astype(pd.Int64Dtype())
+    df_input["Missing_res_msa"] = np.nan
+    df_input.loc[missing_indicies_index, "Missing_res_msa"] = missing_indicies
+    df_input["Missing_res_msa"] = df_input["Missing_res_msa"].astype(pd.Int64Dtype())
     return df_input
 
 
