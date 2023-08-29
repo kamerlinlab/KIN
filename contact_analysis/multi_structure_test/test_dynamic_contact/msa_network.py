@@ -54,54 +54,52 @@ for file_path in msa_df_files:
             )
 
     for index, res_1_msa in enumerate(df["Res1_msa"]):
-        all_interactions_list.append(
-            (res_1_msa, res2_msa_list[index])
-        )
+        all_interactions_list.append((res_1_msa, res2_msa_list[index]))
     all_interactions_dict[system_name] = all_interactions_list
 
 
-def conservation_nextwork_dict(
-    all_int_dict: dict,
-    target_msa_pdb_dict: dict,
-    target_structure: str,
-    index_type: str,
-) -> dict:
-    """Takes in all the contacts in the form of a dictionary, compares it to the structure of the
-    target to make sure that the contacts that are not present are not due to the missing residues,
-    and outputs a dictionary of conservation scores in the desired indexing.
-    """
-    target_contacts = all_int_dict[target_structure]
-    for strucutre, contacts in all_int_dict.items():
-        for contact in contacts:
-            res1_msa = contact[0]
-            res2_msa = contact[1]
-        if 
-    if index_type == "msa":
-        dir_out = conservations_msa
-    elif index_type == "pdb":
-        dir_out = conservations_pdb
-    else:
-        print()
-        print(
-            "ERROR: Incorrecect indexing type is specified for the convservation scores"
-        )
-        print("-----------------------------------------------------------")
-        print()
-        print(
-            "Please specify what is the desiered index for the conservation map residues."
-        )
-        print(
-            'If the indexing according to the pdb of a target structure is desiered set index_type = "pdb"'
-        )
-        print(
-            'If conservation residues should be indexed according to msa indexing set index_type = "msa"'
-        )
-        print()
-    return dir_out
+# def conservation_nextwork_dict(
+# all_int_dict: dict,
+# target_msa_pdb_dict: dict,
+# target_structure: str,
+# index_type: str,
+# ) -> dict:
+# """Takes in all the contacts in the form of a dictionary, compares it to the structure of the
+# target to make sure that the contacts that are not present are not due to the missing residues,
+# and outputs a dictionary of conservation scores in the desired indexing.
+# """
+# target_contacts = all_int_dict[target_structure]
+# for strucutre, contacts in all_int_dict.items():
+# for contact in contacts:
+# res1_msa = contact[0]
+# res2_msa = contact[1]
+# if
+# if index_type == "msa":
+# dir_out = conservations_msa
+# elif index_type == "pdb":
+# dir_out = conservations_pdb
+# else:
+# print()
+# print(
+# "ERROR: Incorrecect indexing type is specified for the convservation scores"
+# )
+# print("-----------------------------------------------------------")
+# print()
+# print(
+# "Please specify what is the desiered index for the conservation map residues."
+# )
+# print(
+#'If the indexing according to the pdb of a target structure is desiered set index_type = "pdb"'
+# )
+# print(
+#'If conservation residues should be indexed according to msa indexing set index_type = "msa"'
+# )
+# print()
+# return dir_out
 
 
 def conservation_nextwork_df(
-    all_int_df: dict(pd.DataFrame),
+    all_int_df: dict,
     target_msa_pdb_dict: dict,
     target_structure: str,
     index_type: str,
@@ -110,18 +108,45 @@ def conservation_nextwork_df(
     target to make sure that the contacts that are not present are not due to the missing residues,
     and outputs a dictionary of conservation scores in the desired indexing.
     """
-    target_contacts = all_int_df[target_structure]
-    for strucutre, contacts in all_int_dict.items():
-        for contact in contacts:
-            res1_msa = contact[0]
-            res2_msa = contact[1]
+    target_df = all_int_df[target_structure]
+    conservation = {}
+    for index, row in target_df.iterrows():
+        res_dont_exist = 0
+        in_contact = 0
+        not_in_contact = 0
 
-            print(res1_msa)
-        quit()
+        target_res1_msa = row["Res1_msa"]
+        target_res2_msa = row["Res2_msa"]
+        for structure, structure_df in all_int_df.items():
+            if structure != target_structure:
+                if (
+                    target_res1_msa in structure_df["Missing_res_msa"]
+                    or target_res2_msa in structure_df["Missing_res_msa"]
+                ):
+                    res_dont_exist += 1
+                    continue
+                if any(
+                    (
+                        (structure_df["Res1_msa"] == target_res1_msa)
+                        & (structure_df["Res2_msa"] == target_res2_msa)
+                    )
+                    | (
+                        (structure_df["Res2_msa"] == target_res2_msa)
+                        & (structure_df["Res1_msa"] == target_res1_msa)
+                    )
+                ):
+                    in_contact = +1
+                else:
+                    not_in_contact = +1
+
+        conservation[(target_res1_msa, target_res2_msa)] = in_contact / (
+            not_in_contact + res_dont_exist
+        )
+    print(conservation)
     if index_type == "msa":
-        dir_out = conservations_msa
+        dir_out = conservation
     elif index_type == "pdb":
-        dir_out = conservations_pdb
+        dir_out = conservation
     else:
         print()
         print(
@@ -142,9 +167,8 @@ def conservation_nextwork_df(
     return dir_out
 
 
-
-conservation_tem_msa = conservation_nextwork_dict(
-    all_interactions_dict, target_msa_pdb, TARGET_STRUCTURE, index_type="msa"
+conservation_tem_msa = conservation_nextwork_df(
+    all_interactions_dfs, target_msa_pdb, TARGET_STRUCTURE, index_type="msa"
 )
 quit()
 # Combining filtered dataframes into a list of tuples,
