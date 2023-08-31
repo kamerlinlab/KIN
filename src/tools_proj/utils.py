@@ -2,6 +2,7 @@
 A collection of useful functions that have no specific home.
 """
 from pathlib import Path
+from typing import Any
 
 
 def open_many_single_frame_contacts_files(
@@ -39,3 +40,28 @@ def open_many_single_frame_contacts_files(
         all_protein_contacts[protein] = prot_contacts
 
     return all_protein_contacts
+
+
+def normalise_dict_values(original_dict: dict[Any, float]) -> dict[Any, float]:
+    """
+    Normalise a set of dictionary values to have max value of 1.
+    Returns the dictionary without modifying the keys.
+
+    Parameters
+    ----------
+    original_dict: dict[Any, float]
+        dictionary to normalise
+
+    Returns
+    ----------
+    dict[Any, float]
+        normalised dictionary
+    """
+    max_score = max((original_dict.values()))
+
+    updated_dict = {}
+    for key, value in original_dict.items():
+        new_score = value / max_score
+        updated_dict[key] = new_score
+
+    return updated_dict
