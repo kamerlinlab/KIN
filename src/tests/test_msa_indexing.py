@@ -23,6 +23,6 @@ msa_df_crystal = indexing_pdb_to_msa(seq, pdb_df_crystal)
 msa_df_crystal.to_csv(MSA_OUTPUT_STATIC, index=False)
 
 # Md data contacts
-pdb_df_md = parse_contact_output(PDB_OUTPUT_DYNAMIC, contact_type="md")
+pdb_df_md = parse_contact_output(PDB_OUTPUT_DYNAMIC, contact_type="md", retention_percent=0.5)
 msa_df_md = indexing_pdb_to_msa(seq, pdb_df_md)
 msa_df_md.to_csv(MSA_OUTPUT_DYNAMIC, index=False)
