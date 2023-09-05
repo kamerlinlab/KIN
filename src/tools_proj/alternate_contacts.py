@@ -5,6 +5,37 @@ belonging to a target protein.
 import re
 import pandas as pd
 
+AMBER_3_LETTER_AA_TO_1 = {
+    "ALA": "A",
+    "ARG": "R",
+    "ASN": "N",
+    "ASH": "D",
+    "ASP": "D",
+    "CYS": "C",
+    "CYX": "C",
+    "CYM": "C",
+    "GLN": "Q",
+    "GLU": "E",
+    "GLH": "E",
+    "GLY": "G",
+    "HIS": "H",
+    "HIE": "H",
+    "HID": "H",
+    "HIP": "H",
+    "ILE": "I",
+    "LEU": "L",
+    "LYS": "K",
+    "LYN": "K",
+    "MET": "M",
+    "PHE": "F",
+    "PRO": "P",
+    "SER": "S",
+    "THR": "T",
+    "TRP": "W",
+    "TYR": "Y",
+    "VAL": "V",
+}
+
 
 def find_equivalent_contacts(
     all_msa_contacs_dfs: dict[str, pd.DataFrame],
@@ -113,6 +144,61 @@ def find_equivalent_contacts(
     )
 
     return contact_combinations, contact_examples
+
+
+def find_possible_single_point_mutations(
+    contact_combinations, target_res_pair: tuple[int, int], target_prot_seq
+) -> list[dict]:
+    """
+    Given a set of contacts
+    """
+    res1_numb, res2_numb = target_res_pair
+    target_res1_aa = target_prot_seq[res1_numb - 1]  # 0-indexed
+    target_res2_aa = target_prot_seq[res2_numb - 1]  # 0-indexed
+
+    numb_to_test = 0
+    mutations_to_try = []
+    for contact, conservation in contact_combinations.items():
+        contact_info = contact.split()
+        res1_3letter, res2_3letter = contact_info[0:2]
+        res1_aa, res2_aa = (
+            AMBER_3_LETTER_AA_TO_1[res1_3letter],
+            AMBER_3_LETTER_AA_TO_1[res2_3letter],
+        )
+
+        if (res1_aa == target_res1_aa) and (res2_aa == target_res2_aa):
+            continue  # same as WT
+
+        if (res1_aa != target_res1_aa) and (res2_aa != target_res2_aa):
+            continue  # can only test single point mutants.
+
+        if conservation < 3:
+            continue  # only test those with 3 or more observations.
+
+        # add the mutation info now.
+        if res1_aa != target_res1_aa:
+            mutation_info = {
+                "res_numb": res1_numb,
+                "wt_res": target_res1_aa,
+                "mutated_res": res1_aa,
+            }
+            if mutation_info in mutations_to_try:
+                continue  # if already included from prior observation.
+            mutations_to_try.append(mutation_info)
+
+        else:  # res2 to mutate instead..
+            mutation_info = {
+                "res_numb": res2_numb,
+                "wt_res": target_res2_aa,
+                "mutated_res": res2_aa,
+            }
+            if mutation_info in mutations_to_try:
+                continue  # if already included from prior observation.
+            mutations_to_try.append(mutation_info)
+
+        numb_to_test += 1
+
+    return mutations_to_try
 
 
 def _create_pdb_to_msa_converter(msa_sequence: str) -> dict[int, int]:
