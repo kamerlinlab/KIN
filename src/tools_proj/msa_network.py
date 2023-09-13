@@ -5,13 +5,17 @@ along with their conservation scores. """
 import glob
 import os
 import time
+import csv
+import ast
 import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
 
 
 def common_network(
     path_input: str,
     target_structure: str,
-    contact_index="pdb",
+    network_index="pdb",
     no_vdw=True,
     only_sc=False,
 ) -> tuple[dict, dict]:
@@ -74,7 +78,7 @@ def common_network(
         missing_res_dict,
         target_msa_pdb,
         target_structure,
-        contact_index,
+        network_index,
         no_vdw,
         only_sc,
     )
@@ -165,6 +169,7 @@ def conservation_nextwork_dict(
         conservation_int_type[(target_res1, target_res2)] = colors[target_int_type]
     if index_type == "msa":
         dir_out = conservation
+        colors_int_type = conservation_int_type
     elif index_type == "pdb":
         conservation_pdb = {}
         conservation_int_type_pdb = {}
@@ -174,6 +179,7 @@ def conservation_nextwork_dict(
             conservation_pdb[contact_pdb] = score
             conservation_int_type_pdb[contact_pdb] = conservation_int_type[contact]
         dir_out = conservation_pdb
+        colors_int_type = conservation_int_type_pdb
 
     else:
         print()
@@ -196,7 +202,7 @@ def conservation_nextwork_dict(
     elapsed_time = end_time - start_time
     print("Function: conservation_nextwork_dict")
     print(f"Elapsed time: {elapsed_time:.6f} seconds")
-    return dir_out, conservation_int_type_pdb
+    return dir_out, colors_int_type
 
 
 def conservation_nextwork_df(
@@ -287,3 +293,143 @@ def conservation_nextwork_df(
     print("Function: conservation_nextwork_df")
     print(f"Elapsed time: {elapsed_time:.6f} seconds")
     return dir_out
+
+
+# Following are analysis functions for the network of contacts
+# TODO: write function desccriptions
+def get_contacts_from_csv(csv_file_path, value_type=float):
+    data = {}
+    with open(csv_file_path, "r") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            for key, value in row.items():
+                key_float = ast.literal_eval(key)
+                if value_type == float:
+                    data[key_float] = float(value)
+                else:
+                    data[key_float] = value
+    return data
+
+
+def make_grid(data, total_res_number):
+    grid = np.zeros((total_res_number + 1, total_res_number + 1))
+    for index, (key, value) in enumerate(data.items()):
+        x = key[0]
+        y = key[1]
+        grid[x][y] = value
+        grid[y][x] = value
+    return grid
+
+
+def difference_matrix(
+    static_network,
+    static_colors,
+    dynamic_network,
+    dynamic_colors,
+    diff_threshold=0.0,
+    only_overlap=False,
+    color_type="int",
+):
+    diff_network = {}
+    diff_colors = {}
+    counter_only_md = 0
+    counter_only_crystal = 0
+    counter_difference = 0
+    diff_list = []
+
+    for key, value in static_network.items():
+        if (key[0], key[1]) in dynamic_network or (key[1], key[0]) in dynamic_network:
+            diff_value = abs(value - dynamic_network[key])
+            if diff_value > diff_threshold:
+                counter_difference += 1
+                diff_network[key] = diff_value
+                diff_colors[key] = static_colors[key]
+                diff_list.append(diff_network[key])
+        if only_overlap:
+            continue
+
+        elif (
+            (key[0], key[1]) not in dynamic_network
+            and (key[1], key[0]) not in dynamic_network
+            and value > diff_threshold
+        ):
+            diff_network[key] = value
+            counter_only_crystal += 1
+            if color_type == "int":
+                diff_colors[key] = static_colors[key]
+            else:
+                diff_colors[key] = "hotpink"
+            diff_list.append(diff_network[key])
+    if not only_overlap:
+        for key, value in dynamic_network.items():
+            if (
+                (key[0], key[1]) not in static_network
+                and (key[1], key[0]) not in static_network
+                and value > diff_threshold
+            ):
+                diff_network[key] = value
+                counter_only_md += 1
+                if color_type == "int":
+                    diff_colors[key] = dynamic_colors[key]
+                else:
+                    diff_colors[key] = "green"
+                diff_list.append(diff_network[key])
+    print("Total number of contacts in the difference network:", len(diff_network))
+    print("Number of only MD contacts:", counter_only_md)
+    print("Number of only crystal contacts:", counter_only_crystal)
+    return diff_network, diff_colors, diff_list
+
+
+def plot_int_map(grid, title, threshold=0.1):
+    x_coords, y_coords = np.meshgrid(np.arange(grid.shape[0]), np.arange(grid.shape[1]))
+    x_coords = x_coords.flatten()
+    y_coords = y_coords.flatten()
+
+    cmap = plt.cm.Reds
+
+    fig, ax = plt.subplots()
+    above_threshold_points = []
+
+    for i in range(grid.shape[0]):
+        for j in range(grid.shape[1]):
+            if grid[i, j] > threshold:
+                above_threshold_points.append((j, i, grid[i, j]))
+
+    x_coords, y_coords, values = zip(*above_threshold_points)
+    x_coords, y_coords, values = (
+        np.array(x_coords),
+        np.array(y_coords),
+        np.array(values),
+    )
+    cmap = plt.cm.get_cmap("Reds")
+    normalize = plt.Normalize(0.1, 1)
+    scatter = ax.scatter(
+        x_coords, y_coords, c=values, cmap=cmap, norm=normalize, marker="s", s=10
+    )
+
+    cbar = plt.colorbar(scatter)
+    cbar.set_label("Contact Value")
+
+    ax.grid(which="both", color="black", linestyle="--", linewidth=0.5, alpha=0.5)
+    ax.set_aspect("equal")
+    plt.title(title)
+    ax.set_xlabel("Residue Index")
+    ax.set_ylabel("Residue Index")
+
+    plt.show()
+
+
+def plot_hist_of_contacts(contact, title, filename, color_choice="blue"):
+    contact_score_list = []
+    for key, value in contact.items():
+        contact_score_list.append(value)
+    plt.hist(
+        contact_score_list, bins=10, alpha=0.7, color=color_choice, edgecolor="black"
+    )
+
+    plt.xlabel("Conservation scores")
+    plt.ylabel("Frequency")
+    plt.title(title)
+    plt.grid(axis="y", linestyle="--", alpha=0.9)
+    plt.show()
+    # plt.savefig(filename)
