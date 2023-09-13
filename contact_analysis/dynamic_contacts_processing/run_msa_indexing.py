@@ -22,12 +22,12 @@ for subdir in os.listdir(INPUT_DIRECTORY):
                 file_path = os.path.join(subdir_path, filename)
                 SYSTEM_NAME = filename.split("_all")[0]
                 output_file_path = os.path.join(
-                    OUTPUT_DIRECTORY, f"{SYSTEM_NAME}_msa_md.csv"
+                    OUTPUT_DIRECTORY, f"{SYSTEM_NAME}_msa_md_90.csv"
                 )
                 print("Processing ", SYSTEM_NAME)
                 seq, short_seq = clean_up_sequence(sequence_dict, SYSTEM_NAME)
                 pdb_df_md = parse_contact_output(
-                    file_path, contact_type="md", retention_percent=0.5
+                    file_path, contact_type="md", retention_percent=0.90
                 )
                 msa_df_md = indexing_pdb_to_msa(seq, pdb_df_md)
                 msa_df_md.to_csv(output_file_path, index=False)

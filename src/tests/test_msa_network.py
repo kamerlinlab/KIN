@@ -20,6 +20,6 @@ input_fiels = (
 projection_output = "/Users/dariiayehorova/lk_research/tools-project/src/tests/data/1M40_TEM-1_test_network.pml"
 
 conservation_tem_msa, colors_int_type = common_network(
-    input_fiels, "1M40_TEM-1", contact_index="pdb", no_vdw=True, only_sc=False
+    input_fiels, "1M40_TEM-1", network_index="pdb", no_vdw=True, only_sc=False
 )
 project_pymol_res_res_scores(conservation_tem_msa, projection_output, colors_int_type)
