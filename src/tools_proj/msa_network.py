@@ -10,15 +10,17 @@ import ast
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from collections import Counter
 
 
 def common_network(
     path_input: str,
     target_structure: str,
     network_index="pdb",
+    missing_network=False,
     no_vdw=True,
     only_sc=False,
-) -> tuple[dict, dict]:
+) -> tuple[dict, dict, dict, dict, pd.DataFrame]:
     """The outermost function that takes in a path to all csv
     files with contacts after msa reindexing was performed.
     The output is a set of two dictionaries:
@@ -82,7 +84,29 @@ def common_network(
         no_vdw,
         only_sc,
     )
-    return conservation_tem_msa_dr, colors_int_type
+    if missing_network:
+        (
+            missing_contacts,
+            missing_contacts_colors,
+            missing_contacts_properties,
+        ) = missing_contacts_dict(
+            all_interactions_dict,
+            target_structure,
+            structure_count,
+            no_vdw,
+            only_sc,
+        )
+    else:
+        missing_contacts = {}
+        missing_contacts_colors = {}
+        missing_contacts_properties = pd.DataFrame()
+    return (
+        conservation_tem_msa_dr,
+        colors_int_type,
+        missing_contacts,
+        missing_contacts_colors,
+        missing_contacts_properties,
+    )
 
 
 def conservation_nextwork_dict(
@@ -293,6 +317,91 @@ def conservation_nextwork_df(
     print("Function: conservation_nextwork_df")
     print(f"Elapsed time: {elapsed_time:.6f} seconds")
     return dir_out
+
+
+def missing_contacts_dict(
+    all_interactions_dict: dict,
+    target_structure: str,
+    structure_count: int,
+    no_vdw=True,
+    only_sc=False,
+) -> tuple[dict, dict, pd.DataFrame]:
+    colors = {}
+    colors["hbond"] = "br1"
+    colors["vdw"] = "green"
+    colors["saltbridge"] = "dash"
+    colors["hydrophobic"] = "br9"
+    colors["pipi"] = "br5"
+    colors["cationpi"] = "brightorange"
+    missing_contacts_count = {}
+    missing_contacts_properties = pd.DataFrame(
+        columns=(
+            "Contact",
+            "Count",
+            "Interaction_Type",
+            "Int_Type_Count",
+            "Location",
+            "Location_Count",
+        )
+    )
+    missing_contacts = {}
+    missing_contacts_colors = {}
+    target_contacts_dict = all_interactions_dict[target_structure]
+    for structure, contact_dict in all_interactions_dict.items():
+        if structure != target_structure:
+            for contact, _ in contact_dict.items():
+                if (contact[0], contact[1]) not in target_contacts_dict and (
+                    contact[1],
+                    contact[0],
+                ) not in target_contacts_dict:
+                    if contact not in missing_contacts_count:
+                        missing_contacts_count[contact] = 1
+                    else:
+                        missing_contacts_count[contact] += 1
+    counter = 0
+    int_type_list = []
+    int_type_count_list = []
+    location_list = []
+    location_count_list = []
+    for contact, value in missing_contacts_count.items():
+        int_type = []
+        location = []
+        for structure, contact_dict in all_interactions_dict.items():
+            if structure != target_structure:
+                if contact in contact_dict:
+                    int_type.append(contact_dict[contact][0])
+                    location.append(contact_dict[contact][1])
+        int_type_count = Counter(int_type)
+        location_count = Counter(location)
+        common_int_type = int_type_count.most_common(1)[0][0]
+        count_int_type = int_type_count.most_common(1)[0][1]
+
+        common_location = location_count.most_common(1)[0][0]
+        count_location = location_count.most_common(1)[0][1]
+
+        if no_vdw:
+            if common_int_type == "vdw":
+                continue
+        if only_sc:
+            location = common_location.split("-")
+            if location[0] != "sc" or location[1] != "sc":
+                continue
+        counter += 1
+        missing_contacts[contact] = value / structure_count
+        missing_contacts_colors[contact] = colors[common_int_type]
+        int_type_list.append(common_int_type)
+        int_type_count_list.append(count_int_type / len(int_type))
+        location_list.append(common_location)
+        location_count_list.append(count_location / len(location))
+
+    missing_contacts_properties["Contact"] = missing_contacts.keys()
+    missing_contacts_properties["Count"] = missing_contacts.values()
+    missing_contacts_properties["Interaction_Type"] = int_type_list
+    missing_contacts_properties["Int_Type_Count"] = int_type_count_list
+    missing_contacts_properties["Location"] = location_list
+    missing_contacts_properties["Location_Count"] = location_count_list
+
+    return missing_contacts, missing_contacts_colors, missing_contacts_properties
 
 
 # Following are analysis functions for the network of contacts

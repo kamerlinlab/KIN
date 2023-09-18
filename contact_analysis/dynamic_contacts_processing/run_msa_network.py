@@ -7,8 +7,8 @@ from tools_proj.pymol_projections import project_pymol_res_res_scores
 from tools_proj.msa_network import common_network
 
 
-input_fiels = "/Users/dariiayehorova/lk_research/tools-project/contact_analysis/dynamic_contacts_processing/msa_index_contacts/retention_90"
-projection_output = "1M40_TEM-1_network_90.pml"
+input_fiels = "/Users/dariiayehorova/lk_research/tools-project/contact_analysis/dynamic_contacts_processing/msa_index_contacts/retention_0"
+projection_output = "1M40_TEM-1_network_0.pml"
 contact_index = "pdb"
 
 conservation_tem_msa, colors_int_type = common_network(
@@ -18,10 +18,10 @@ if contact_index == "pdb":
     project_pymol_res_res_scores(
         conservation_tem_msa, projection_output, colors_int_type
     )
-    output_filename = "network_tem1_pdb_90.csv"
-    colors_file = "colors_tem1_pdb_90.csv"
+    output_filename = "network_tem1_pdb_0.csv"
+    colors_file = "colors_tem1_pdb_0.csv"
 else:
-    output_filename = "network_tem1_msa_90.csv"
+    output_filename = "network_tem1_msa_0.csv"
 
 counter_50 = 0
 counter_90 = 0
