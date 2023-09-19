@@ -3,14 +3,16 @@ and outputs a network of contacts shared among all the structures
 along with their conservation scores. """
 
 import glob
+from math import e
 import os
+from re import I
 import time
 import csv
 import ast
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 from collections import Counter
+import matplotlib.pyplot as plt
 
 
 def common_network(
@@ -20,7 +22,7 @@ def common_network(
     missing_network=False,
     no_vdw=True,
     only_sc=False,
-) -> tuple[dict, dict, dict, dict, pd.DataFrame]:
+) -> tuple[dict, dict, pd.DataFrame, dict, dict, pd.DataFrame]:
     """The outermost function that takes in a path to all csv
     files with contacts after msa reindexing was performed.
     The output is a set of two dictionaries:
@@ -75,7 +77,7 @@ def common_network(
                 int_type_list[index],
                 int_location[index],
             )
-    conservation_tem_msa_dr, colors_int_type = conservation_nextwork_dict(
+    conservation_tem_msa_dr, colors_int_type, properties = conservation_nextwork_dict(
         all_interactions_dict,
         missing_res_dict,
         target_msa_pdb,
@@ -103,6 +105,7 @@ def common_network(
     return (
         conservation_tem_msa_dr,
         colors_int_type,
+        properties,
         missing_contacts,
         missing_contacts_colors,
         missing_contacts_properties,
@@ -117,7 +120,7 @@ def conservation_nextwork_dict(
     index_type: str,
     exclude_vdw=True,
     only_sc=False,
-) -> tuple[dict, dict]:
+) -> tuple[dict, dict, pd.DataFrame]:
     """Takes in all the contacts in the form of a dictionary, compares it to the structure of the
     target to make sure that the contacts that are not present are not due to the missing residues,
     and outputs a dictionary of conservation scores in the desired indexing.
@@ -133,6 +136,16 @@ def conservation_nextwork_dict(
     colors["pipi"] = "br5"
     colors["cationpi"] = "brightorange"
     conservation_int_type = {}
+    common_int_type_list = []
+    common_loc_list = []
+    Res1_msa_list = []
+    Res2_msa_list = []
+    Res1_pdb_list = []
+    Res2_pdb_list = []
+    structure_int_type_list = []
+    structure_loc_list = []
+    conservation_list = []
+
     for target_contacts, target_properties in target_contacts_dict.items():
         contact_yes = 0
         contact_no = 0
@@ -140,15 +153,17 @@ def conservation_nextwork_dict(
         total_structure = 0
         target_res1 = target_contacts[0]
         target_res2 = target_contacts[1]
-
         target_int_type = target_properties[0]
-        if exclude_vdw is True and target_int_type == "vdw":
-            continue
-        if only_sc is True:
-            target_int_location = target_properties[0]
-            target_loc_1, target_loc_2 = target_int_location.split("-")
-            if target_loc_1 != "sc" or target_loc_2 != "sc":
-                continue
+        # if exclude_vdw is True and target_int_type == "vdw":
+        #    continue
+        # if only_sc is True:
+        #   target_int_location = target_properties[1]
+        #  target_loc_1, target_loc_2 = target_int_location.split("-")
+        #   if target_loc_1 != "sc" or target_loc_2 != "sc":
+        #       continue
+        contact_int_type_list = []
+        contact_loc_list = []
+
         for structure, contact_dict in all_int_dict.items():
             if structure != target_structure:
                 total_structure += 1
@@ -159,41 +174,89 @@ def conservation_nextwork_dict(
 
                 if (target_res1, target_res2) in contact_dict:
                     properties = contact_dict[(target_res1, target_res2)]
-                    if exclude_vdw is True:
-                        int_type = properties[0]
-                        if int_type == "vdw":
-                            continue
-                    if only_sc is True:
-                        int_location = properties[1]
-                        loc_1, loc_2 = int_location.split("-")
-                        if loc_1 != "sc" or loc_2 != "sc":
-                            continue
+                    # if exclude_vdw is True:
+                    # int_type = properties[0]
+                    # if int_type == "vdw":
+                    #     continue
+                    # if only_sc is True:
+                    #   int_location = properties[1]
+                    #  loc_1, loc_2 = int_location.split("-")
+                    # if loc_1 != "sc" or loc_2 != "sc":
+                    #    continue
                     contact_yes += 1
+                    contact_int_type_list.append(properties[0])
+                    contact_loc_list.append(properties[1])
 
                 elif (
                     target_res2,
                     target_res1,
                 ) in contact_dict:
                     properties = contact_dict[(target_res2, target_res1)]
-                    if exclude_vdw is True:
-                        int_type = properties[0]
-                        if int_type == "vdw":
-                            continue
-                    if only_sc is True:
-                        int_location = properties[1]
-                        loc_1, loc_2 = int_location.split("-")
-                        if loc_1 != "sc" or loc_2 != "sc":
-                            continue
+                    #  if exclude_vdw is True:
+                    #      int_type = properties[0]
+                    #      if int_type == "vdw":
+                    #          continue
+                    #  if only_sc is True:
+                    #      int_location = properties[1]
+                    #      loc_1, loc_2 = int_location.split("-")
+                    #      if loc_1 != "sc" or loc_2 != "sc":
+                    #          continue
                     contact_yes += 1
+                    contact_int_type_list.append(properties[0])
+                    contact_loc_list.append(properties[1])
+
                 else:
                     contact_no += 1
+        if exclude_vdw is True:
+            if target_int_type == "vdw":
+                continue
+        if only_sc is True:
+            target_int_location = target_properties[1]
+            target_loc_1, target_loc_2 = target_int_location.split("-")
+            if target_loc_1 != "sc" or target_loc_2 != "sc":
+                continue
+        if len(contact_int_type_list) != 0 and len(contact_loc_list) != 0:
+            contact_int_type_count = Counter(contact_int_type_list)
+            contact_loc_count = Counter(contact_loc_list)
+            common_int_type = contact_int_type_count.most_common(1)[0][0]
+            common_loc = contact_loc_count.most_common(1)[0][0]
+            common_int_type_list.append(common_int_type)
+            common_loc_list.append(common_loc)
+        else:
+            common_int_type_list.append("None")
+            common_loc_list.append("None")
+            print("no contact for this residue pair")
+        Res1_msa_list.append(target_res1)
+        Res2_msa_list.append(target_res2)
+        structure_int_type_list.append(target_int_type)
+        structure_loc_list.append(target_properties[1])
+        contact_pdb = target_msa_pdb_dict[(target_res1, target_res2)]
+        contact_pdb = (int(contact_pdb[0][3:]), int(contact_pdb[1][3:]))
+        Res1_pdb_list.append(contact_pdb[0])
+        Res2_pdb_list.append(contact_pdb[1])
         conservation[(target_res1, target_res2)] = contact_yes / (
             contact_dna + contact_no + contact_yes
         )
+        conservation_list.append(conservation[(target_res1, target_res2)])
+
         conservation_int_type[(target_res1, target_res2)] = colors[target_int_type]
     if index_type == "msa":
         dir_out = conservation
         colors_int_type = conservation_int_type
+        properties_df = pd.DataFrame(
+            {
+                "Res1_msa": Res1_msa_list,
+                "Res2_msa": Res2_msa_list,
+                "Res1_pdb": Res1_pdb_list,
+                "Res2_pdb": Res2_pdb_list,
+                "struc_int_type": structure_int_type_list,
+                "struc_loc": structure_loc_list,
+                "common_int_type": common_int_type_list,
+                "common_loc": common_loc_list,
+                "conservation": conservation_list,
+            }
+        )
+
     elif index_type == "pdb":
         conservation_pdb = {}
         conservation_int_type_pdb = {}
@@ -204,6 +267,19 @@ def conservation_nextwork_dict(
             conservation_int_type_pdb[contact_pdb] = conservation_int_type[contact]
         dir_out = conservation_pdb
         colors_int_type = conservation_int_type_pdb
+        properties_df = pd.DataFrame(
+            {
+                "Res1_msa": Res1_msa_list,
+                "Res2_msa": Res2_msa_list,
+                "Res1_pdb": Res1_pdb_list,
+                "Res2_pdb": Res2_pdb_list,
+                "struc_int_type": structure_int_type_list,
+                "struc_loc": structure_loc_list,
+                "common_int_type": common_int_type_list,
+                "common_loc": common_loc_list,
+                "conservation": conservation_list,
+            }
+        )
 
     else:
         print()
@@ -222,11 +298,12 @@ def conservation_nextwork_dict(
             'If conservation residues should be indexed according to msa indexing set index_type = "msa"'
         )
         print()
+        quit()
     end_time = time.time()
     elapsed_time = end_time - start_time
     print("Function: conservation_nextwork_dict")
     print(f"Elapsed time: {elapsed_time:.6f} seconds")
-    return dir_out, colors_int_type
+    return dir_out, colors_int_type, properties_df
 
 
 def conservation_nextwork_df(
