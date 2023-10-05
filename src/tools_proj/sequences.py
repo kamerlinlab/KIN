@@ -3,17 +3,18 @@ Various functions to help work with protein sequences
 """
 
 
-def seq_align_file_to_sequences(alignment_file: str, output_msa_style: bool) -> dict[str, list[str]]:
+def seq_align_file_to_sequences(
+    alignment_file: str, output_msa_style: bool
+) -> dict[str, list[str]]:
     """
-    Take a sequence alignment file with multiple sequences,
-    extract each sequence and sequence name and return them as a dict.
-
-    Sequences returned are formatted as a list for easy indexing
+    Take a sequence alignment file with multiple sequences
+    and extract each sequence and the name of the sequence/protein.
+    Return each sequence as a dictionrary item.
 
     Parameters
     ----------
     alignment_file: str
-        Path to the alingment file to process.
+        Path to the alignment file to process.
 
     output_msa_style: bool
         If True, then sequences returned in msa formatting.
@@ -23,9 +24,8 @@ def seq_align_file_to_sequences(alignment_file: str, output_msa_style: bool) -> 
     Returns
     ----------
     dict[str, list[str]
-        keys of the dictionary are each protein (name obtained the seq alingment file).
-        Values are a list of each residue in the sequence.
-
+        keys of the dictionary are each protein (obtained from the seq alignment file).
+        Values are a list of each amino acid (1 letter code) in the sequence.
     """
     seq_alignments = {}
     with open(alignment_file, "r", encoding="utf-8") as file_in:

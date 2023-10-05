@@ -1,5 +1,15 @@
 """
 A collection of useful functions that have no specific home.
+
+Functions included are:
+1. open_many_single_frame_contacts_files()
+    Open a number of single frame contact analysis files.
+
+2. normalise_dict_values()
+    Normalise a set of dictionary values to have max value of 1.
+
+3. per_residue_distance_to_site()
+    Calculate the closest heavy atom distance of each residue to a specific site
 """
 from typing import Optional, Any
 import warnings
@@ -83,7 +93,7 @@ def per_residue_distance_to_site(
 ) -> dict:
     """
     Taken directly from https://github.com/kamerlinlab/KIF
-    Calculate the closest heavy atom distance of each residue to an mdtraj defined
+    Calculate the closest heavy atom distance of each residue to an MDAnalysis defined
     selection of a site of interest. You can write the results to file if desired.
 
     Parameters
@@ -92,9 +102,9 @@ def per_residue_distance_to_site(
         Path to pdb file to use for the distance calculation.
 
     site_defintion : str
-        mdtraj compatable defintion of the site of interest
-        (i.e. binding site, active site etc..)
-        See here for examples: https://mdtraj.org/1.9.3/atom_selection.html
+        MDAnalysis compatable defintion of the site of interest
+        (i.e. could describe a binding site, active site etc..)
+        See here for help: https://docs.mdanalysis.org/stable/documentation_pages/selections.html
 
     first_residue : int
         First residue to measure the distance from.
