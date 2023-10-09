@@ -1,7 +1,7 @@
-# You can run me in several ways, perhaps the easiest way is to:
+# To use this script you can:
 # 1. Load the PDB file of your system in PyMOL.
-# 2. Type: @[FILE_NAME.py] in the command line.
-# 3. Make sure the .py files are in the same directory as the pdb.
+# 2. Run this file with:'@[FILE_NAME]' in the command line.
+# 3. Make sure this file is in the same directory as the pdb.
 distance interaction1, resid 37 and name CA, resid 159 and name CA 
 set dash_radius, 0.3, interaction1 
 set dash_color, br1, interaction1 
