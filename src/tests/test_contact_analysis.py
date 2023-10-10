@@ -1,20 +1,28 @@
 """
 Integration style tests for the contact analyser.
 
-# def test_traject_pdb
+test_single_frame_contact_analysis()
+    Test analysis on single pdb works and coord and topol work.
+    And that they give the same and expected number of contacts.
 
-# test_traject_topolgy
+def test_partial_selection()
+    Confirm two smaller selections give the same result as a complete selection
 
-# test_single_struct
+def test_traject()
+    Test a 5 frame trajectory gives expected result
 
-# test_single_frame_blocks
-# confirm single frame in blocks give same
-# contacts as seperate.
+def test_amber_traject()
+    Test a 5 frame amber trajectory gives expected result.
 
-# test_bad_residue_selection
-# make sure exits if bad residue selection made.
+def test_multi_frame_pdb()
+    Test a 5 frame pdb gives expected result.
+
+def test_bad_residue_selection(first, last, error_type)
+    Make sure fails if a "bad" residue selection is made.
+
 """
 from pathlib import Path
+import pytest
 import tools_proj.contacts as contact_analysis
 from tools_proj.contacts.contact_analysis import single_frame_contact_analysis
 from tools_proj.contacts.contact_analysis import multi_frame_contact_analysis
@@ -90,7 +98,7 @@ def test_partial_selection():
 
 def test_traject():
     """
-    Test a 5 frame trajectory gives expected result
+    Test a 5 frame ambermd trajectory gives expected result
     """
     trajectory_file_path = str(TEST_DATA_DIR / TEST_FILES["pdb_traject"])
 
@@ -107,7 +115,6 @@ def test_multi_frame_pdb():
     """
     Test a 5 frame pdb gives expected result.
     """
-
     trajectory_file_path = str(TEST_DATA_DIR / TEST_FILES["pdb_traject"])
 
     result = multi_frame_contact_analysis(
@@ -136,3 +143,29 @@ def test_amber_traject():
     )
 
     assert result.shape == (5, 157)
+
+
+res_numbers = [
+    (1, 10000, KeyError),
+    (0, 10, KeyError),
+    (-1, 10, KeyError),
+    (15, 10, ValueError),
+]
+
+
+@pytest.mark.parametrize("first, last, error_type", res_numbers)
+def test_bad_residue_selection(first, last, error_type):
+    """
+    Make sure fails if a "bad" residue selection is made.
+    """
+    coord_file_path = str(TEST_DATA_DIR / TEST_FILES["amber_inpcrd"])
+    topology_file_path = str(TEST_DATA_DIR / TEST_FILES["amber_topology"])
+
+    with pytest.raises(error_type):
+        _ = single_frame_contact_analysis(
+            coordinates_file=coord_file_path,
+            topology_file=topology_file_path,
+            out_file="tmp.tmp",
+            first_res=first,
+            last_res=last,
+        )
