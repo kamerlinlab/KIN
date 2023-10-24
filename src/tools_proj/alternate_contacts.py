@@ -1,6 +1,9 @@
 """
-Module that helps find alternative contacts given a pair of residues
+Module that helps find alternative contact combinations given a pair of residues
 belonging to a target protein.
+
+This can therefore be used to suggest single or double mutations for
+a given target protein.
 """
 import re
 import pandas as pd
@@ -46,21 +49,23 @@ def find_equivalent_contacts(
     """
     Given a target protein and a pair of residues in that target protein, find all
     other proteins that have that contact pair.
+    Returns two dictionaries
 
     Parameters
     ----------
     all_msa_contacs_dfs: dict[str, pd.DataFrame],
         dictionary of dataframes, with keys being each protein.
-        Dataframe contacts information about each contact.
+        Values are a dataframe of contacts data for each protein.
 
     target_res_pair: tuple[int, int]
         Residue numbers of the pair of residues that form a contact in the protein of interest.
+        This is the pdb numbering, i.e. not the msa numbering.
 
     target_msa_seq: str
         msa sequence for the target protein.
 
     no_vdws: bool
-        If set to True, interactions of type "vdws" will not be included in the output.
+        If set to True, interactions of type "vdws" will not be included in the calculation.
 
     Returns
     ----------
@@ -72,7 +77,7 @@ def find_equivalent_contacts(
     contact_examples: dict[str, tuple[str, int, int]]
         Examples of the different types of interactions formed between the residue pair.
         Each key is a string describing the type of contact.
-        Values are a tuple containing the protein name, and both residues involved.
+        Each value is a tuple containing the protein name, and both residues involved.
     """
     msa_to_pdb_converter = _create_pdb_to_msa_converter(msa_sequence=target_msa_seq)
 
@@ -97,7 +102,6 @@ def find_equivalent_contacts(
 
         res1_numb = re.search(r"\d+", res1_pdb).group()
         res1_name = re.search(r"[a-zA-z]+", res1_pdb).group()
-
         res2_numb = re.search(r"\d+", res2_pdb).group()
         res2_name = re.search(r"[a-zA-z]+", res2_pdb).group()
 
@@ -147,16 +151,42 @@ def find_equivalent_contacts(
 
 
 def find_possible_single_point_mutations(
-    contact_combinations, target_res_pair: tuple[int, int], target_prot_seq
+    contact_combinations: dict[str, int],
+    target_res_pair: tuple[int, int],
+    target_prot_seq: list[str],
+    conservation_cutoff: int = 3,
 ) -> list[dict]:
     """
-    Given a set of contacts
+    Given a dictionary of residue pairs in contact, find all possible single point mutations
+    that can be made.
+
+    Parameters
+    ----------
+    contact_combinations: dict[str, int]
+        Different types of interactions formed between a residue pair and their frequency.
+        Each key is a string describing the type of contact.
+        Each value refers to the number of observations of that contact.
+
+    target_res_pair: tuple[int, int]
+        The residue numbers of the contact for the target protein.
+
+    target_prot_seq: list[str]
+        One letter amino acid sequence of the target protein.
+
+    conservation_cutoff: int = 3,
+        The minimum number of proteins the contact needs to have been observed in to be considered.
+        Default = 3.
+
+    Returns
+    ----------
+    list[dict]
+        List of mutations to try. Each list item is a different mutation.
+        Each list item is a dictionary containing information about the mutation.
     """
     res1_numb, res2_numb = target_res_pair
     target_res1_aa = target_prot_seq[res1_numb - 1]  # 0-indexed
     target_res2_aa = target_prot_seq[res2_numb - 1]  # 0-indexed
 
-    numb_to_test = 0
     mutations_to_try = []
     for contact, conservation in contact_combinations.items():
         contact_info = contact.split()
@@ -168,35 +198,92 @@ def find_possible_single_point_mutations(
 
         if (res1_aa == target_res1_aa) and (res2_aa == target_res2_aa):
             continue  # same as WT
-
         if (res1_aa != target_res1_aa) and (res2_aa != target_res2_aa):
             continue  # can only test single point mutants.
+        if conservation < conservation_cutoff:
+            continue
 
-        if conservation < 3:
-            continue  # only test those with 3 or more observations.
-
-        # add the mutation info now.
+        # add the single mutation info
         if res1_aa != target_res1_aa:
             mutation_info = {
                 "res_numb": res1_numb,
                 "wt_res": target_res1_aa,
                 "mutated_res": res1_aa,
             }
-            if mutation_info in mutations_to_try:
-                continue  # if already included from prior observation.
-            mutations_to_try.append(mutation_info)
-
         else:  # res2 to mutate instead..
             mutation_info = {
                 "res_numb": res2_numb,
                 "wt_res": target_res2_aa,
                 "mutated_res": res2_aa,
             }
-            if mutation_info in mutations_to_try:
-                continue  # if already included from prior observation.
-            mutations_to_try.append(mutation_info)
 
-        numb_to_test += 1
+        if mutation_info in mutations_to_try:
+            continue  # if already included from a prior observation.
+        mutations_to_try.append(mutation_info)
+
+    return mutations_to_try
+
+
+def find_possible_double_mutations(
+    contact_combinations, target_res_pair: tuple[int, int], target_prot_seq
+) -> list[dict]:
+    """
+    Given a dictionary of residue pairs in contact, find all possible double mutations
+    that can be made.
+    Parameters
+    ----------
+    contact_combinations: dict[str, int]
+        Different types of interactions formed between a residue pair and their frequency.
+        Each key is a string describing the type of contact.
+        Each value refers to the number of observations of that contact.
+
+    target_res_pair: tuple[int, int]
+        The residue numbers of the contact for the target protein.
+
+    target_prot_seq: list[str]
+        One letter amino acid sequence of the target protein.
+
+    conservation_cutoff: int = 3,
+        The minimum number of proteins the contact needs to have been observed in to be considered.
+        Default = 3.
+
+    Returns
+    ----------
+    list[dict]
+        List of mutations to try. Each list item is a different double mutation.
+        Each list item is a dictionary containing information about the double mutation.
+    """
+    res1_numb, res2_numb = target_res_pair
+    target_res1_aa = target_prot_seq[res1_numb - 1]  # 0-indexed
+    target_res2_aa = target_prot_seq[res2_numb - 1]  # 0-indexed
+
+    mutations_to_try = []
+    for contact, conservation in contact_combinations.items():
+        contact_info = contact.split()
+        res1_3letter, res2_3letter = contact_info[0:2]
+        res1_aa, res2_aa = (
+            AMBER_3_LETTER_AA_TO_1[res1_3letter],
+            AMBER_3_LETTER_AA_TO_1[res2_3letter],
+        )
+
+        # only looking for double mutants.
+        if (res1_aa == target_res1_aa) or (res2_aa == target_res2_aa):
+            continue
+        if conservation < 3:
+            continue  # only test those with 3 or more observations.
+
+        # add the double mutation info
+        mutation_info = {
+            "res1_numb": res1_numb,
+            "wt_res1": target_res1_aa,
+            "mutated_res1": res1_aa,
+            "res2_numb": res2_numb,
+            "wt_res2": target_res2_aa,
+            "mutated_res2": res2_aa,
+        }
+        if mutation_info in mutations_to_try:
+            continue  # if already included from prior observation.
+        mutations_to_try.append(mutation_info)
 
     return mutations_to_try
 

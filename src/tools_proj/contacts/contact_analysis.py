@@ -386,6 +386,13 @@ def _prep_system(
     else:
         final_res = last_res
 
+    if start_res >= final_res:
+        raise ValueError(
+            f"""Your current selection of first_res and last_res would give you no results.
+            Revise them and re-run the command.
+            The last residue I found in your protein has residue number:{max(ca_atoms.resids)} """
+        )
+
     return universe, start_res, final_res
 
 
