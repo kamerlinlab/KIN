@@ -1,23 +1,28 @@
+from math import e
+from tkinter import font
 from scipy.stats import pearsonr
 import numpy as np
 import matplotlib.pyplot as plt
 import csv
 import ast
 from tools_proj.pymol_projections import project_pymol_res_res_scores
+from collections import Counter
 
 total_res_number = 263
-network_crystal_file = "static_contacts_processing/shared_network/network_tem1_pdb.csv"
-colors_crystal_file = "static_contacts_processing/shared_network/colors_tem1_pdb.csv"
-network_crystal_file = "static_contacts_processing/shared_network/network_tem1_pdb.csv"
-colors_crystal_file = "static_contacts_processing/shared_network/colors_tem1_pdb.csv"
+network_crystal_file = "static_contacts_processing/shared_network/network_tem1_nvw_pdb.csv"
+colors_crystal_file = "static_contacts_processing/shared_network/colors_tem1_nvw_pdb.csv"
 network_md_file_50 = (
-    "dynamic_contacts_processing/shared_network/network_tem1_pdb_50.csv"
+    "dynamic_contacts_processing/shared_network/network_tem1_pdb_nv_50.csv"
 )
-colors_md_file_50 = "dynamic_contacts_processing/shared_network/colors_tem1_pdb_50.csv"
+colors_md_file_50 = (
+    "dynamic_contacts_processing/shared_network/colors_tem1_pdb_nv_50.csv"
+)
 network_md_file_10 = (
-    "dynamic_contacts_processing/shared_network/network_tem1_pdb_10.csv"
+    "dynamic_contacts_processing/shared_network/network_tem1_pdb_nv_10.csv"
 )
-colors_md_file_10 = "dynamic_contacts_processing/shared_network/colors_tem1_pdb_10.csv"
+colors_md_file_10 = (
+    "dynamic_contacts_processing/shared_network/colors_tem1_pdb_nv_10.csv"
+)
 
 
 def get_contacts_from_csv(csv_file_path, value_type=float):
@@ -97,9 +102,9 @@ def difference_matrix(
                 else:
                     diff_colors[key] = "green"
                 diff_list.append(diff_network[key])
-    print("Total number of contacts in the difference network:", len(diff_network))
-    print("Number of only MD contacts:", counter_only_md)
-    print("Number of only crystal contacts:", counter_only_crystal)
+    print("Total Number of Contacts in the Difference Network:", len(diff_network))
+    print("Number of Only MD Contacts:", counter_only_md)
+    print("Number of Only Crystal Contacts:", counter_only_crystal)
     return diff_network, diff_colors, diff_list
 
 
@@ -145,14 +150,72 @@ def plot_int_map(grid, title):
 
 
 def plot_hist_of_contacts(contact, title, filename, color="blue"):
-    contact_score_list = []
-    for key, value in contact.items():
-        contact_score_list.append(value)
+    if isinstance(contact, dict):
+        contact_score_list = []
+        for key, value in contact.items():
+            contact_score_list.append(value)
+    elif isinstance(contact, list):
+        contact_score_list = contact
+        identities = color
+        if isinstance(color, list):
+            bins = [0, 0.2, 0.4, 0.6, 0.8, 1]
+            bin_data = {}
+            for i in range(len(bins) - 1):
+                bin_data[(bins[i], bins[i + 1])] = Counter()
+
+            # Sort scores into bins and count interactions
+            for score, identity in zip(contact_score_list, identities):
+                for low, high in bin_data.keys():
+                    if low <= score < high:
+                        bin_data[(low, high)][identity] += 1
+                        break
+
+            # Calculate fractional compositions
+            fraction_data = {}
+            for bin_range, counts in bin_data.items():
+                total = sum(counts.values())
+                if total > 0:
+                    fraction_data[bin_range] = {k: v / total for k, v in counts.items()}
+            # Plotting
+            fig, ax = plt.subplots()
+
+            # X-axis positions for the bins
+            x_pos = np.arange(len(bin_data.keys()))
+            x_labels = [f"{low}-{high}" for low, high in bin_data.keys()]
+
+            for i, (low, high) in enumerate(bin_data.keys()):
+                bottom_value = 0
+                for identity, fraction in fraction_data.get((low, high), {}).items():
+                    ax.bar(
+                        x_pos[i],
+                        fraction,
+                        width=0.4,
+                        label=identity if i == 0 else "",
+                        bottom=bottom_value,
+                        edgecolor="black",
+                    )
+                    bottom_value += fraction
+            # Labels and title
+            ax.set_ylabel("Fraction of Interactions")
+            ax.set_xlabel("Conservation Score Bins")
+            ax.set_title("Fractional Composition of Interaction Types per Bin")
+            ax.set_xticks(x_pos)
+            ax.set_xticklabels(x_labels)
+            ax.legend()
+
+            plt.show()
+            exit()
+    else:
+        raise TypeError("Contact must be either a list or a dictionary")
+
     plt.hist(contact_score_list, bins=10, alpha=0.7, color=color, edgecolor="black")
 
-    plt.xlabel("Conservation scores")
-    plt.ylabel("Frequency")
-    plt.title(title)
+    plt.xlabel("Conservation Scores", fontsize=16)
+    plt.ylabel("Number of Contacts", fontsize=16)
+    plt.xticks(fontsize=14)
+    plt.yticks(fontsize=14)
+    plt.title(title, fontsize=18)
+
     plt.grid(axis="y", linestyle="--", alpha=0.9)
     plt.savefig(filename)
     plt.show()
@@ -165,7 +228,29 @@ colors_crystal = get_contacts_from_csv(colors_crystal_file, value_type=str)
 colors_md_10 = get_contacts_from_csv(colors_md_file_10, value_type=str)
 colors_md_50 = get_contacts_from_csv(colors_md_file_50, value_type=str)
 
+contacts_lost_from10_to50 = []
+colors = []
+for key, value in network_md_10.items():
+    if key not in network_md_50:
+        contacts_lost_from10_to50.append(value)
+        colors.append(colors_md_10[key])
 
+plot_hist_of_contacts(
+    contacts_lost_from10_to50,
+    "Contacts Lost from 10% to 50% MD Cutoff",
+    "contacts_lost_from10_to50.png",
+    color="mediumaquamarine",
+)
+high_score_counter = 0
+for i in contacts_lost_from10_to50:
+    if i > 0.8:
+        high_score_counter += 1
+print(
+    "Number of Contacts with Score > 0.8:",
+    high_score_counter / len(contacts_lost_from10_to50),
+)
+print(high_score_counter)
+print(len(contacts_lost_from10_to50))
 diff_network_50_0, diff_colors_50_0, diff_list_50_0 = difference_matrix(
     network_crystal,
     colors_crystal,
@@ -175,7 +260,7 @@ diff_network_50_0, diff_colors_50_0, diff_list_50_0 = difference_matrix(
     only_overlap=True,
 )
 FILENAME_PYMOL = "tem1_only_overlap_contacts_50_0.pml"
-project_pymol_res_res_scores(diff_network_50_0, FILENAME_PYMOL, diff_colors_50_0)
+# project_pymol_res_res_scores(diff_network_50_0, FILENAME_PYMOL, diff_colors_50_0)
 
 diff_network_10_0, diff_colors_10_0, diff_list_10_0 = difference_matrix(
     network_crystal,
@@ -186,7 +271,7 @@ diff_network_10_0, diff_colors_10_0, diff_list_10_0 = difference_matrix(
     only_overlap=True,
 )
 FILENAME_PYMOL = "tem1_only_overlap_contacts_10_0.pml"
-project_pymol_res_res_scores(diff_network_10_0, FILENAME_PYMOL, diff_colors_10_0)
+# project_pymol_res_res_scores(diff_network_10_0, FILENAME_PYMOL, diff_colors_10_0)
 
 diff_network_50_02, diff_colors_50_02, diff_list_50_02 = difference_matrix(
     network_crystal,
@@ -197,7 +282,7 @@ diff_network_50_02, diff_colors_50_02, diff_list_50_02 = difference_matrix(
     only_overlap=True,
 )
 FILENAME_PYMOL = "tem1_only_overlap_contacts_50_02.pml"
-project_pymol_res_res_scores(diff_network_50_02, FILENAME_PYMOL, diff_colors_50_02)
+# project_pymol_res_res_scores(diff_network_50_02, FILENAME_PYMOL, diff_colors_50_02)
 
 diff_network_10_02, diff_colors_10_02, diff_list_10_02 = difference_matrix(
     network_crystal,
@@ -208,7 +293,7 @@ diff_network_10_02, diff_colors_10_02, diff_list_10_02 = difference_matrix(
     only_overlap=True,
 )
 FILENAME_PYMOL = "tem1_only_overlap_contacts_10_02.pml"
-project_pymol_res_res_scores(diff_network_10_02, FILENAME_PYMOL, diff_colors_10_02)
+# project_pymol_res_res_scores(diff_network_10_02, FILENAME_PYMOL, diff_colors_10_02)
 
 diff_network_50_05, diff_colors_50_05, diff_list_50_05 = difference_matrix(
     network_crystal,
@@ -244,8 +329,8 @@ grid_from_difference_10_02 = make_grid(diff_network_10_02, total_res_number)
 grid_from_difference_50_02 = make_grid(diff_network_50_02, total_res_number)
 grid_from_difference_50_05 = make_grid(diff_network_50_05, total_res_number)
 grid_from_difference_10_05 = make_grid(diff_network_10_05, total_res_number)
-grid_from_difference_50_07 = make_grid(diff_network_50_05, total_res_number)
-grid_from_difference_10_07 = make_grid(diff_network_10_05, total_res_number)
+grid_from_difference_50_07 = make_grid(diff_network_50_07, total_res_number)
+grid_from_difference_10_07 = make_grid(diff_network_10_07, total_res_number)
 corr_coef_05, _ = pearsonr(
     grid_from_difference_10_05.flatten(), grid_from_difference_10_0.flatten()
 )
@@ -274,5 +359,5 @@ print("Correlation coefficient at 50% MD filtering and 0.7 break:", corr_coef_50
 print("Correlation coefficient with 0 threshold:", corr_coef_0)
 print("Correlation coefficient with 0.2 threshold:", corr_coef_02)
 print("Correlation coefficient with 0.5 threshold:", corr_coef_05)
-plot_int_map(grid_from_difference_50_07, "50% MD filtering and 0.7 break")
-plot_int_map(grid_from_difference_10_07, "10% MD filtering and 0.7 break")
+plot_int_map(grid_from_difference_50_0, "50% MD filtering and 0.7 break")
+plot_int_map(grid_from_difference_10_0, "10% MD filtering and 0.7 break")
