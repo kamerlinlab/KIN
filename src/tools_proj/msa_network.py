@@ -9,10 +9,14 @@ from re import I
 import time
 import csv
 import ast
+from tkinter import W, font, scrolledtext
+from turtle import width
+from matplotlib.font_manager import font_scalings
 import pandas as pd
 import numpy as np
 from collections import Counter
 import matplotlib.pyplot as plt
+from pyparsing import col
 
 
 def common_network(
@@ -31,6 +35,8 @@ def common_network(
     (indexing type can be changed between msa and pdb of projected structure);
     second dictionary contains analogous contacts and matching colors that describe interaction type.
     """
+    print(path_input)
+    print(target_structure)
     intputs = path_input + "/*.csv"
     msa_df_files = glob.glob(intputs)
 
@@ -49,6 +55,11 @@ def common_network(
         structure_count += 1
 
         df = pd.read_csv(file_path)
+        if no_vdw is True:
+            df = df[df["Interaction_Type"] != "vdw"]
+        if only_sc is True:
+            df = df[df["Residue_Parts"] != "mc-mc"]
+
         all_interactions_dfs[system_name] = df
         res1_msa_list = list(df["Res1_msa"])
         res2_msa_list = list(df["Res2_msa"])
@@ -207,14 +218,14 @@ def conservation_nextwork_dict(
 
                 else:
                     contact_no += 1
-        if exclude_vdw is True:
-            if target_int_type == "vdw":
-                continue
-        if only_sc is True:
-            target_int_location = target_properties[1]
-            target_loc_1, target_loc_2 = target_int_location.split("-")
-            if target_loc_1 != "sc" or target_loc_2 != "sc":
-                continue
+        # if exclude_vdw is True:
+        # if target_int_type == "vdw":
+        #     continue
+        # if only_sc is True:
+        #    target_int_location = target_properties[1]
+        #    target_loc_1, target_loc_2 = target_int_location.split("-")
+        # if target_loc_1 != "sc" or target_loc_2 != "sc":
+        #        continue
         if len(contact_int_type_list) != 0 and len(contact_loc_list) != 0:
             contact_int_type_count = Counter(contact_int_type_list)
             contact_loc_count = Counter(contact_loc_list)
@@ -566,13 +577,12 @@ def difference_matrix(
     return diff_network, diff_colors, diff_list
 
 
-def plot_int_map(grid, title, threshold=0.1):
+def plot_int_map(grid, title, color="Reds", threshold=0.1):
     x_coords, y_coords = np.meshgrid(np.arange(grid.shape[0]), np.arange(grid.shape[1]))
     x_coords = x_coords.flatten()
     y_coords = y_coords.flatten()
-
+    plt.rcParams["font.size"] = 20
     cmap = plt.cm.Reds
-
     fig, ax = plt.subplots()
     above_threshold_points = []
 
@@ -587,14 +597,14 @@ def plot_int_map(grid, title, threshold=0.1):
         np.array(y_coords),
         np.array(values),
     )
-    cmap = plt.cm.get_cmap("Reds")
+    cmap = plt.cm.get_cmap(color)
     normalize = plt.Normalize(0.1, 1)
     scatter = ax.scatter(
         x_coords, y_coords, c=values, cmap=cmap, norm=normalize, marker="s", s=10
     )
 
     cbar = plt.colorbar(scatter)
-    cbar.set_label("Contact Value")
+    cbar.set_label("Conservation Score")
 
     ax.grid(which="both", color="black", linestyle="--", linewidth=0.5, alpha=0.5)
     ax.set_aspect("equal")
@@ -619,3 +629,155 @@ def plot_hist_of_contacts(contact, title, filename, color_choice="blue"):
     plt.grid(axis="y", linestyle="--", alpha=0.9)
     plt.show()
     # plt.savefig(filename)
+
+
+def plot_per_res_score(
+    residue_score_dict,
+    max_residue,
+    important_residues,
+    close_residues,
+    title,
+    bar=False,
+):
+    """
+    Plots per-residue scores.
+
+    Parameters:
+    - residue_score_dict: A dictionary where the key is residue number and value is the score.
+    - important_residues: A list of residue indices that are experimentally important and should be highlighted.
+    - close_residues: residues within the active site (within 5 angstroms of the ligand)
+    - max_residue: The maximum residue number you're interested in (defines the range for x-axis).
+    - title: The title of the plot.
+    Returns:
+    - A plot of the scores with important residues highlighted.
+    """
+
+    # Create a list of residue indices
+    scored_residues = [
+        residue for residue in residue_score_dict.keys() if residue <= max_residue
+    ]
+    scores = [residue_score_dict[residue] for residue in scored_residues]
+    #    if bar == True:
+    print(close_residues)
+    print(important_residues)
+    colors = [
+        "lime"
+        if residue in important_residues
+        else "magenta"
+        if residue in close_residues
+        else "grey"
+        for residue in scored_residues
+    ]
+    overlap = []
+    for res in scored_residues:
+        if res in close_residues:
+            overlap.append(res)
+    print("Overlap", overlap)
+
+    value_color = list(zip(scores, colors, scored_residues))
+    sorted_zipped = sorted(value_color, key=lambda x: x[0], reverse=True)
+    sorted_values, sorted_colors, sorted_residues = zip(*sorted_zipped)
+    no_0_list = list(filter(lambda x: x != 0, sorted_values))
+    sorted_colors = sorted_colors[: len(no_0_list)]
+    plt.bar(
+        range(len(sorted_colors)), no_0_list, color=sorted_colors
+    )  # s=50 to increase size of scatter points
+    # plt.xticks(fontsize=18)
+    plt.xticks(fontsize=18)
+    plt.yticks(fontsize=18)
+    plt.xlabel("Hierarchical Residue Index", fontsize=20)
+    plt.ylabel("KIN per Residue Conservation", fontsize=20)
+    # plt.title(f"{title}", fontsize=20)
+
+    # Set x-axis limits to display entire residue range
+    plt.xlim(-3, len(sorted_colors) + 1)
+
+    # Highlight important residues in the legend
+    plt.legend(
+        handles=[
+            plt.Line2D(
+                [0],
+                [0],
+                marker="o",
+                color="w",
+                markerfacecolor="magenta",
+                markersize=10,
+                label="Active Site",
+            ),
+            plt.Line2D(
+                [0],
+                [0],
+                marker="o",
+                color="w",
+                markerfacecolor="lime",
+                markersize=10,
+                label="Catalytic Residue",
+            ),
+            plt.Line2D(
+                [0],
+                [0],
+                marker="o",
+                color="w",
+                markerfacecolor="grey",
+                markersize=10,
+                label="Other",
+            ),
+        ],
+        loc="upper right",
+        fontsize=18,
+        edgecolor="black",
+    )
+
+    # plt.show()
+
+    # Sort the scores and get the indices
+    # sorted_indices = np.argsort(scores)[::-1]
+    # print(sorted_indices)
+    # Initialize counters for true positive and false positive
+    true_pos_imp = 0
+    true_pos_close = 0
+    # Initialize lists to store fractions
+    fractions_imp = []
+    fractions_close = []
+    print("important residues", important_residues)
+    # Iterate over different top percentages
+    for percentage in range(10, 101, 10):
+        top_n = int(len(scores) * percentage / 100)
+        top_indices = sorted_residues[:top_n]
+        print(top_indices)
+        # Count how many important residues are in the top
+        true_pos_imp = len(set(top_indices) & set(important_residues))
+        true_pos_close = len(set(top_indices) & set(close_residues))
+        print("true positive:", true_pos_close)
+        print("true positive:", true_pos_imp)
+        # Compute the fraction of total important residues identified
+        fraction_imp = true_pos_imp / len(important_residues)
+        fraction_close = true_pos_close / len(close_residues)
+        fractions_imp.append(fraction_imp)
+        fractions_close.append(fraction_close)
+    # Plotting
+    plt.figure(figsize=(10, 6))
+    plt.ylim(0, 1.1)
+    plt.plot(
+        range(10, 101, 10),
+        fractions_imp,
+        marker="o",
+        color="limegreen",
+        linewidth=2,
+        label=f"Catalytic Residues (n={len(important_residues)})",
+    )
+    plt.plot(
+        range(10, 101, 10),
+        fractions_close,
+        marker="x",
+        color="magenta",
+        linewidth=2,
+        label=f"Active Site (n={len(close_residues)})",
+    )
+    plt.xlabel("Top Percentage of all Ranked Residues", fontsize=20)
+    plt.ylabel("Fraction of Important Residues Scored", fontsize=20)
+    plt.yticks(fontsize=18)
+    plt.xticks(fontsize=18)
+    plt.legend(fontsize=20, edgecolor="black")
+    plt.grid(True)
+    plt.show()
