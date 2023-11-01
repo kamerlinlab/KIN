@@ -252,19 +252,19 @@ corr_coef_20, _ = pearsonr(grid_crystal.flatten(), grid_md_20.flatten())
 print("Correlation coefficient for 10% frames and crystal: ", corr_coef_10)
 print("Correlation coefficient for 20% frames and crystal: ", corr_coef_20)
 toolsnet.plot_int_map(
-    grid_crystal_hbond, "H-bond Contacts from Crystal Structure", "Blues"
+    grid_crystal_hbond, "H-bond Contacts from Crystal Structures", "Blues"
 )
 toolsnet.plot_int_map(
-    grid_crystal_hydrophobic, "Hydrophobic Contacts from Crystal Structure", "Reds"
+    grid_crystal_hydrophobic, "Hydrophobic Contacts from Crystal Structures", "Reds"
 )
 toolsnet.plot_int_map(
-    grid_crystal_other, "Other Contacts from Crystal Structure", "Greens"
+    grid_crystal_other, "Other Contacts from Crystal Structures", "Greens"
 )
-toolsnet.plot_int_map(grid_md_10_hbond, "H-bond Contacts from MD Simulation", "Blues")
+toolsnet.plot_int_map(grid_md_10_hbond, "H-bond Contacts from MD Simulations", "Blues")
 toolsnet.plot_int_map(
-    grid_md_10_hydrophobic, "Hydrophobic Contacts from MD Simulation", "Reds"
+    grid_md_10_hydrophobic, "Hydrophobic Contacts from MD Simulations", "Reds"
 )
-toolsnet.plot_int_map(grid_md_10_other, "Other Contacts from MD Simulation", "Greens")
+toolsnet.plot_int_map(grid_md_10_other, "Other Contacts from MD Simulations", "Greens")
 # quit()
 hbond = 0
 vdw = 0
@@ -589,8 +589,8 @@ grid_md_10 = toolsnet.make_grid(network_md_10, TOTAL_RES_NUMBER)
 grid_md_50 = toolsnet.make_grid(network_md_50, TOTAL_RES_NUMBER)
 grid_md_90 = toolsnet.make_grid(network_md_90, TOTAL_RES_NUMBER)
 
-toolsnet.plot_int_map(grid_crystal, "Contacts from Crystal Structure")
-toolsnet.plot_int_map(grid_md_50, "Contacts from MD Simulation")
+toolsnet.plot_int_map(grid_crystal, "Contacts from Crystal Structures")
+toolsnet.plot_int_map(grid_md_10, "Contacts from MD Simulations")
 toolsnet.plot_int_map(
     grid_md_50, "Contacts from MD Simulation (contact is in 50% of frames)"
 )
