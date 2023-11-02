@@ -127,7 +127,20 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-
-# pdb files generated
+# Mac files
+.DS_Store
+# pdb and other files generated
+*.pml
+*.png
+*.pdf
+*.pse
+*.cif
 protein_prep/crystal_structure_selection/pdb_files/*
+protein_prep/2_reduce/*
+protein_prep/3_propka/*
+protein_prep/4_pdb4amber/*
 
+contact_analysis/*pdb
+contact_analysis/*png
+contact_analysis/*pml
+contact_analysis/*pse
