@@ -1,9 +1,10 @@
 # KIN - Key Interactions Network
 
 This repository contains the work done for the publication titled:"Key Interaction Networks: Identifying Evolutionarily Conserved Non-Covalent Interaction Networks Across Protein Families"
-![image](https://github.com/kamerlinlab/tools-project/assets/66267331/f631aa2a-f80f-49cf-98b2-46a9fb488da9)
 
 In this work, we studied the non-covalent interaction networks of all unique class A $\beta$-lactamases structures to identify a network of evolutionarily conserved interactions present throughout the family.
+![overview_res](https://github.com/kamerlinlab/tools-project/assets/66267331/a3ccc535-6716-45c0-9556-e4898d96bd97)
+
 
 ## The repository is broken up into several subfolders for different sections of the project:
 
