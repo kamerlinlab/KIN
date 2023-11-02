@@ -1,6 +1,6 @@
 """Following code adds the msa-based indexing to both residues of each contact"""
 
-from math import nan
+import warnings
 import pandas as pd
 import numpy as np
 
@@ -12,7 +12,7 @@ def parse_fasta(file_path):
     current_name = None
     current_sequence = []
 
-    with open(file_path, "r") as file:
+    with open(file_path, "r", encoding="utf-8") as file:
         for line in file:
             line = line.strip()
 
@@ -87,6 +87,8 @@ def indexing_pdb_to_msa(
     df_input = df_input[new_order]
     # Make a df column with all missing residues and the rest of them fill in with Nan
     missing_indicies_index = range(len(missing_indicies))
+    # In this case, it is okay.
+    pd.options.mode.chained_assignment = None  # default = warn
     df_input["Missing_res_msa"] = np.nan
     df_input.loc[missing_indicies_index, "Missing_res_msa"] = missing_indicies
     df_input["Missing_res_msa"] = df_input["Missing_res_msa"].astype(pd.Int64Dtype())
