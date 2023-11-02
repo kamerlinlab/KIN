@@ -4,8 +4,7 @@ This repository contains the work done for the publication titled:"Key Interacti
 
 
 In this work, we studied the non-covalent interaction networks of all unique class A $\beta$-lactamases structures to identify a network of evolutionarily conserved interactions present throughout the family.
-![summary](https://github.com/kamerlinlab/tools-project/assets/66267331/9fd44825-c4b9-4e9a-8b60-1f306fea0a68)
-
+![overview](https://github.com/kamerlinlab/tools-project/assets/66267331/92786e8a-dd5d-43a3-a23c-2405cf8dc0fd)
 
 
 ## The repository is broken up into several subfolders for different sections of the project:
