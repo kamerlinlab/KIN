@@ -1,17 +1,6 @@
 #!/bin/bash
 
-#Rory's Paths 
-#module purge
-#source /proj/uucompbiochem/software/amber20/amber20mpi/amber.sh
-#conda activate /home/x_rorcr/.conda/envs/Py3_7_Pyemma
-#mkdir /proj/uucompbiochem/users/x_rorcr/TOOLS_Proj/Setup/XXX
-#export BASE_PREP=/proj/uucompbiochem/users/x_rorcr/TOOLS_Proj/Setup/Protein_Prep_V2
-#export BASE_RUN=/proj/uucompbiochem/users/x_rorcr/TOOLS_Proj/Setup/XXX
-#
-#SUBMIT_FILE=XXX.sh
 
-
-# Dariia's Paths
 export BASE=/storage/home/hhive1/dyehorova3/data/tools/tools-project
 export BASE_PREP=/storage/home/hhive1/dyehorova3/data/tools/tools-project/protein_prep
 export BASE_ANALYSIS=/storage/home/hhive1/dyehorova3/data/tools/tools-project/md_analysis
