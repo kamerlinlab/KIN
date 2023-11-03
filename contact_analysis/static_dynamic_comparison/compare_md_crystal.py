@@ -1,9 +1,9 @@
 from fileinput import filename
 from tkinter import W, font
 from scipy.stats import pearsonr
-from tools_proj.pymol_projections import project_pymol_res_res_scores
+from kin.pymol_projections import project_pymol_res_res_scores
 import pandas as pd
-import tools_proj.msa_network as toolsnet
+import kin.msa_network as toolsnet
 import matplotlib.pyplot as plt
 import numpy as np
 

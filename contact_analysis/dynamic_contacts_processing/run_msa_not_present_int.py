@@ -15,7 +15,7 @@ from typing import Union, Dict, Tuple
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from tools_proj.pymol_projections import project_pymol_res_res_scores
+from kin.pymol_projections import project_pymol_res_res_scores
 
 input_fiels = "/Users/dariiayehorova/lk_research/tools-project/contact_analysis/dynamic_contacts_processing/msa_index_contacts/retention_90"
 projection_output = "1M40_TEM-1_missing_90.pml"

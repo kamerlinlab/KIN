@@ -23,9 +23,9 @@ def test_bad_residue_selection(first, last, error_type)
 """
 from pathlib import Path
 import pytest
-import tools_proj.contacts as contact_analysis
-from tools_proj.contacts.contact_analysis import single_frame_contact_analysis
-from tools_proj.contacts.contact_analysis import multi_frame_contact_analysis
+import kin.contacts as contact_analysis
+from kin.contacts.contact_analysis import single_frame_contact_analysis
+from kin.contacts.contact_analysis import multi_frame_contact_analysis
 
 # location of data.
 CONTACTS_FILE_LOCATION = Path(contact_analysis.__file__)

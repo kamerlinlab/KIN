@@ -18,15 +18,15 @@ import pandas as pd
 from MDAnalysis import Universe
 from MDAnalysis.analysis import distances
 
-from tools_proj.contacts.salt_bridges import (
+from kin.contacts.salt_bridges import (
     check_for_salt_bridge,
     check_for_c_term_salt_bridge,
 )
-from tools_proj.contacts.hbonds import check_for_hbond
-from tools_proj.contacts.cation_pi import check_for_cation_pi
-from tools_proj.contacts.pi_pi import check_for_pi_pi
-from tools_proj.contacts.hydrophobic import check_for_hydrophobic
-from tools_proj.contacts.van_der_waals import check_for_vdw_interaction
+from kin.contacts.hbonds import check_for_hbond
+from kin.contacts.cation_pi import check_for_cation_pi
+from kin.contacts.pi_pi import check_for_pi_pi
+from kin.contacts.hydrophobic import check_for_hydrophobic
+from kin.contacts.van_der_waals import check_for_vdw_interaction
 
 # Used to prefilter residue pairs.
 MAX_CA_DIST = 20

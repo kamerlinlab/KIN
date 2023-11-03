@@ -1,11 +1,11 @@
-"""Converting all the md-based contacts to the msa indexing and counting contacts only if they are 
+"""Converting all the md-based contacts to the msa indexing and counting contacts only if they are
 Present in 50% of the simultion time"""
 import os
 
-from tools_proj.msa_indexing import parse_fasta
-from tools_proj.msa_indexing import indexing_pdb_to_msa
-from tools_proj.msa_indexing import clean_up_sequence
-from tools_proj.msa_indexing import parse_contact_output
+from kin.msa_indexing import parse_fasta
+from kin.msa_indexing import indexing_pdb_to_msa
+from kin.msa_indexing import clean_up_sequence
+from kin.msa_indexing import parse_contact_output
 
 
 INPUT_DIRECTORY = "/Users/dariiayehorova/lk_research/tools-project/contact_analysis/simulation_contacts"

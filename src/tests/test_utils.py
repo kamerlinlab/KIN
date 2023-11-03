@@ -3,9 +3,9 @@ Tests for the utils module
 """
 from pathlib import Path
 import pytest
-import tools_proj.contacts as contact_analysis
+import kin.contacts as contact_analysis
 
-from tools_proj.utils import per_residue_distance_to_site, normalise_dict_values
+from kin.utils import per_residue_distance_to_site, normalise_dict_values
 
 # location of data.
 CONTACTS_FILE_LOCATION = Path(contact_analysis.__file__)

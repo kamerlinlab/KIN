@@ -10,7 +10,7 @@ import numpy as np
 from MDAnalysis import Universe
 from MDAnalysis.analysis import distances
 
-from tools_proj.contacts.utils import angle_between_two_vectors, normal_vector_3_atoms
+from kin.contacts.utils import angle_between_two_vectors, normal_vector_3_atoms
 
 # Constants
 # From souce, 5 membered rings used for pi-pi stacking for TRP.

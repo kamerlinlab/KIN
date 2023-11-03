@@ -3,11 +3,11 @@ and outputs a network of contacts shared among all the structures
 along with their conservation scores. """
 
 import csv
-from tools_proj.pymol_projections import project_pymol_res_res_scores
-from tools_proj.msa_network import common_network
-from tools_proj.msa_network import plot_hist_of_contacts as his
-from tools_proj.pymol_projections import project_pymol_per_res_scores
-from tools_proj.msa_network import plot_per_res_score
+from kin.pymol_projections import project_pymol_res_res_scores
+from kin.msa_network import common_network
+from kin.msa_network import plot_hist_of_contacts as his
+from kin.pymol_projections import project_pymol_per_res_scores
+from kin.msa_network import plot_per_res_score
 
 input_fiels = "/Users/dariiayehorova/lk_research/tools-project/contact_analysis/static_contacts_processing/msa_index_contacts/"
 projection_output = "shared_network/1M40_TEM-1_sc_nvw_network.pml"

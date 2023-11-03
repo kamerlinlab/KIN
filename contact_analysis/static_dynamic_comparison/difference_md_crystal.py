@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import csv
 import ast
-from tools_proj.pymol_projections import project_pymol_res_res_scores
+from kin.pymol_projections import project_pymol_res_res_scores
 from collections import Counter
 
 total_res_number = 263

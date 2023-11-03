@@ -6,10 +6,10 @@ import csv
 from re import I
 
 from matplotlib import colors
-from tools_proj.pymol_projections import project_pymol_res_res_scores
-from tools_proj.pymol_projections import project_pymol_per_res_scores
-from tools_proj.msa_network import common_network
-from tools_proj.msa_network import plot_per_res_score
+from kin.pymol_projections import project_pymol_res_res_scores
+from kin.pymol_projections import project_pymol_per_res_scores
+from kin.msa_network import common_network
+from kin.msa_network import plot_per_res_score
 from matplotlib import pyplot as plt
 
 

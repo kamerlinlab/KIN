@@ -6,7 +6,7 @@ import itertools
 import numpy as np
 from MDAnalysis import Universe
 from MDAnalysis.analysis import distances
-from tools_proj.contacts.utils import angle_between_two_vectors
+from kin.contacts.utils import angle_between_two_vectors
 
 
 SC_HBOND_RES_ATOMS_ACCEPTOR = {

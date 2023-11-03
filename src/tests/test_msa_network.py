@@ -2,9 +2,9 @@
 and outputs a network of contacts shared among all the structures
 along with their conservation scores. """
 
-from tools_proj.pymol_projections import project_pymol_res_res_scores
+from kin.pymol_projections import project_pymol_res_res_scores
 
-from tools_proj.msa_network import common_network
+from kin.msa_network import common_network
 
 
 input_fiels = (

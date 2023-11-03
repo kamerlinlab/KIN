@@ -145,3 +145,5 @@ contact_analysis/*pdb
 contact_analysis/*png
 contact_analysis/*pml
 contact_analysis/*pse
+
+comparitive_data/comparison_results/*

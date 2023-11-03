@@ -8,7 +8,7 @@ import numpy as np
 from MDAnalysis import Universe
 from MDAnalysis.analysis import distances
 
-from tools_proj.contacts.utils import angle_between_two_vectors, normal_vector_3_atoms
+from kin.contacts.utils import angle_between_two_vectors, normal_vector_3_atoms
 
 # Constants
 CAT_PI_RES_ATOMS_CATION = {"LYS": "NZ", "ARG": "CZ"}

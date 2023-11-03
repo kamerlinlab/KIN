@@ -1,10 +1,10 @@
-"""Following code provides an example of the series of 
+"""Following code provides an example of the series of
 command to go from the contacts to the msa indexing"""
 
-from tools_proj.msa_indexing import parse_fasta
-from tools_proj.msa_indexing import indexing_pdb_to_msa
-from tools_proj.msa_indexing import clean_up_sequence
-from tools_proj.msa_indexing import parse_contact_output
+from kin.msa_indexing import parse_fasta
+from kin.msa_indexing import indexing_pdb_to_msa
+from kin.msa_indexing import clean_up_sequence
+from kin.msa_indexing import parse_contact_output
 
 
 MSA_SEQUENCES_FILE = "data/bettaLac.ali"
