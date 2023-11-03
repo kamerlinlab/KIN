@@ -5,7 +5,7 @@ This repository provides the tool Key Interaction Networks (KIN) for analyzing c
 This document both describes how to install and use the tool and provides data to reproduce the calculations performed in the accompanying paper.
 
 In this work, we studied the non-covalent interaction networks of all unique class A $\beta$-lactamases structures to identify a network of evolutionarily conserved interactions present throughout the family.
-![Presentation2_equaltext](https://github.com/kamerlinlab/tools-project/assets/66267331/f3e23737-ce47-4c89-94b6-600d6d79d035)
+![Presentation2_equaltext](https://github.com/kamerlinlab/KIN/assets/66267331/d08b7e2e-b7c4-4fcc-b569-75077b1b652e)
 
 ## Dependencies and Install
 The installable portion of this code was written using Python 3.10, and we recommend using the same version of Python or higher, as well as using a new virtual environment.
