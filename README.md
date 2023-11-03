@@ -1,10 +1,34 @@
-# KIN - Key Interactions Network
+# KIN - Key Interaction Networks
 
-This repository contains the work done for the publication titled: "Key Interaction Networks: Identifying Evolutionarily Conserved Non-Covalent Interaction Networks Across Protein Families"
+This repository provides the tool Key Interaction Networks (KIN) for analyzing conserved interaction networks across families of protein structures.  It is described in the publication "Key Interaction Networks: Identifying Evolutionarily Conserved Non-Covalent Interaction Networks Across Protein Families".
+
+This document both describes how to install and use the tool and provides data to reproduce the calculations performed in the accompanying paper.
 
 In this work, we studied the non-covalent interaction networks of all unique class A $\beta$-lactamases structures to identify a network of evolutionarily conserved interactions present throughout the family.
 ![Presentation2_equaltext](https://github.com/kamerlinlab/tools-project/assets/66267331/f3e23737-ce47-4c89-94b6-600d6d79d035)
 
+## Dependencies and Install
+The installable portion of this code was written using Python 3.10, and we recommend using the same version of Python or higher, as well as using a new virtual environment.
+
+If you're using [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/getting-started.html), you can create a new virtual environment as follows:
+```
+conda create -n environment_name python=3.11
+conda activate environment_name
+```
+
+To install the code you can use either of the following options:
+
+**Option 1: Install with pip**
+```
+pip install key-interactions-network
+```
+
+**Option 2: Clone/Download Repo first and then run setup.py :**
+
+```
+cd KIN-main
+python setup.py install
+```
 
 ## The repository is broken up into several subfolders for different sections of the project:
 
@@ -13,7 +37,7 @@ In this work, we studied the non-covalent interaction networks of all unique cla
       - A set of modules that enabled us to determine the non-covalent interactions present in the crystal structures and MD simulations.
       - A set of modules that were used to help us analyse the dataset we generated.
 
-   [How to install this code is described below.](#dependencies-and-install)
+   [How to install this code is described above.](#dependencies-and-install)
 
 #### 2. protein_prep
    In this folder, we identify all unique $\beta$-lactamase structures with help of the [$\beta$-lactamase database](http://bldb.eu/). Then each crystal structure is put through a series of steps to clean it for both contact analysis and MD simulations.
@@ -41,28 +65,6 @@ The automated workflow can be found in the protein_prep/run_files where Commands
 
    [The folder has its own readme with more detailed information](https://github.com/kamerlinlab/tools-project/tree/main/comparative_data#readme)
 
-## Dependencies and Install
-The installable portion of this code was written using Python 3.10, and we recommend using the same version of Python or higher, as well as using a new virtual environment.
-
-If you're using [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/getting-started.html), you can create a new virtual environment as follows:
-```
-conda create -n environment_name python=3.11
-conda activate environment_name
-```
-
-To install the code you can use either of the following options:
-
-**Option 1: Install with pip**
-```
-pip install key-interactions-network
-```
-
-**Option 2: Clone/Download Repo first and then run setup.py :**
-
-```
-cd KIN-main
-python setup.py install
-```
 
 ## License and Disclaimer
 
@@ -79,8 +81,6 @@ Key Interaction Networks: Identifying Evolutionarily Conserved Non-Covalent Inte
 Authors: Dariia Yehorova, Rory M. Crean, Peter M. Kasson and Shina Caroline Lynn Kamerlin
 
 DOI: TODO
-
-(once published this section will be updated with the link to the publication instead of the preprint).
 
 
 
