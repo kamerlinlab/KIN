@@ -36,10 +36,10 @@ The automated workflow can be found in the protein_prep/run_files where Commands
 #### 5. contact_analysis
    This folder contains contacts obtained from the crystal structure and MD runs of all structures. It also contains example scripts for the formation and analysis of shared interaction networks from static and MD contacts. This folder also provides an example of a workflow that outputs the network of evolutionary preserved interactions that are missing in the protein of interest. 
 
-#### 6. comparitive_data
+#### 6. comparative_data
    Inside this folder, we compared our results to several existing methods and datasets, as well as studied our dataset in more detail.
 
-   [The folder has its own readme with more detailed information](https://github.com/kamerlinlab/tools-project/tree/main/comparitive_data#readme)
+   [The folder has its own readme with more detailed information](https://github.com/kamerlinlab/tools-project/tree/main/comparative_data#readme)
 
 ## Dependencies and Install
 The installable portion of this code was written using Python 3.10, and we recommend using the same version of Python or higher, as well as using a new virtual environment.
