@@ -18,12 +18,12 @@ setup(
     description=DESCRIPTION,
     long_description=LONG_DESCRIPTION,
     author="Dariia Yehorova, Rory Crean",
-    author_email="",  # TODO - Add whoever uploads to PyPI here
-    # url="", TODO - once name chosen.
+    author_email="rory.crean@kemi.uu.se",  # uploaded to PyPI.
+    url="https://github.com/kamerlinlab/KIN",
     packages=find_packages(where="src"),
     package_dir={"": "src"},
     install_requires=[
-        "jupyter",
+        "notebook",
         "scikit-learn",
         "scipy",
         "numpy",
@@ -35,7 +35,7 @@ setup(
         "kaleido",
     ],
     extras_require={
-        "dev": ["pytest", "black"],
+        "dev": ["pytest", "black", "setuptools", "twine"],
     },
     python_requires=">=3.10",
     classifiers=[
