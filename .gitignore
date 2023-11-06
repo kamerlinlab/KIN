@@ -135,7 +135,6 @@ dmypy.json
 *.pdf
 *.pse
 *.cif
-*.csv
 protein_prep/crystal_structure_selection/pdb_files/*
 protein_prep/2_reduce/*
 protein_prep/3_propka/*
