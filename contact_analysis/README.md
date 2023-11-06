@@ -1,1 +1,1 @@
-This folder contains examples for obtaining contact from crystal structure and MD, shared interaction network and missing interaction network. We also provide examples of scripts that help to compare interaction networks obtained from MD and crystal structure. 
+This folder contains examples for obtaining contacts from crystal structures and MD trajectories and forming shared or missing interaction networks. We also provide examples of scripts that help to compare interaction networks obtained from MD and crystal structure. 
