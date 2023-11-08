@@ -9,8 +9,6 @@ from re import I
 import time
 import csv
 import ast
-from tkinter import W, font, scrolledtext
-from turtle import width
 from matplotlib.font_manager import font_scalings
 import pandas as pd
 import numpy as np
@@ -95,7 +93,6 @@ def common_network(
         target_structure,
         network_index,
         conservation_uniform,
-        no_vdw,
     )
     if missing_network:
         (
@@ -106,8 +103,6 @@ def common_network(
             all_interactions_dict,
             target_structure,
             structure_count,
-            no_vdw,
-            only_sc,
         )
     else:
         missing_contacts = {}
@@ -312,12 +307,6 @@ def conservation_nextwork_df(
         if exclude_vdw is True and row["Interaction_Type"] == "vdw":
             continue
 
-        if only_sc is True:
-            int_location = row["Residue_Parts"]
-            int_loc1, int_loc2 = int_location.split("-")
-            if int_loc1 != "sc" or int_loc2 != "sc":
-                continue
-
         for structure, structure_df in all_int_df.items():
             total_structure += 1
             if structure != target_structure:
@@ -388,8 +377,6 @@ def missing_contacts_dict(
     all_interactions_dict: dict,
     target_structure: str,
     structure_count: int,
-    no_vdw=True,
-    only_sc=False,
 ) -> tuple[dict, dict, pd.DataFrame]:
     colors = {}
     colors["hbond"] = "br1"
@@ -444,13 +431,6 @@ def missing_contacts_dict(
         common_location = location_count.most_common(1)[0][0]
         count_location = location_count.most_common(1)[0][1]
 
-        if no_vdw:
-            if common_int_type == "vdw":
-                continue
-        if only_sc:
-            location = common_location.split("-")
-            if location[0] != "sc" or location[1] != "sc":
-                continue
         counter += 1
         missing_contacts[contact] = value / structure_count
         missing_contacts_colors[contact] = colors[common_int_type]
@@ -499,8 +479,8 @@ def filter_network(
     network,
     colors,
     properties,
+    min_score=0.0,
     network_index="pdb",
-    int_strength=0.0,
     no_main_chain=False,
     int_exclude=None,
 ):
@@ -526,7 +506,7 @@ def filter_network(
             print("-----------------------------------------------------------")
             return None
 
-        if value > int_strength:
+        if value > min_score:
             if no_main_chain:
                 location_1 = properties.loc[mask_1, "struc_location"]
                 location_2 = properties.loc[mask_2, "struc_location"]
