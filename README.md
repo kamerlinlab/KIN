@@ -74,7 +74,7 @@ As this software was made in part by people employed by Georgia Tech University 
 
 
 ## Citing this work
-If you make use of this work [please cite our preprint:](TODO add link)
+If you make use of this work [please cite our preprint](https://chemrxiv.org/engage/chemrxiv/article-details/6545240848dad2312001fbf6)
 
 Key Interaction Networks: Identifying Evolutionarily Conserved Non-Covalent Interaction Networks Across Protein Families
 
