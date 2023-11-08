@@ -29,7 +29,11 @@ pip install key-interactions-network
 cd KIN-main
 python setup.py install
 ```
+## How to use KIN
+   We are working on a set of Jupyter notebooks that provide easy-to-follow examples of KIN application and follow-up analysis.
 
+   [**shared_network.ipynb**](https://github.com/kamerlinlab/KIN/blob/main/contact_analysis/shared_network.ipynb) - Example workflow for the formation of the conserved interaction network, missing interaction network from both MD and crystal structure data.
+   
 ## The repository is broken up into several subfolders for different sections of the project:
 
 #### 1. src
@@ -65,7 +69,7 @@ The automated workflow can be found in the protein_prep/run_files where Commands
 
    [The folder has its own readme with more detailed information](https://github.com/kamerlinlab/tools-project/tree/main/comparative_data#readme)
 
-
+   
 ## License and Disclaimer
 
 This software is published under a GNU General Public License v2.0.
@@ -80,7 +84,7 @@ Key Interaction Networks: Identifying Evolutionarily Conserved Non-Covalent Inte
 
 Authors: Dariia Yehorova, Rory M. Crean, Peter M. Kasson and Shina Caroline Lynn Kamerlin
 
-DOI: TODO
+DOI: 10.26434/chemrxiv-2023-1dmdx
 
 
 

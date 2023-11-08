@@ -1,4 +1,4 @@
-Inside this folder, we compared our results to several existing methods and datasets, as well as studied our own results in more detail. The results from this section are described in further detail in our publication(TODO - ADD LINK).
+Inside this folder, we compared our results to several existing methods and datasets, as well as studied our own results in more detail. [The results obtained from this section are described in further detail in our publication.](https://chemrxiv.org/engage/chemrxiv/article-details/6545240848dad2312001fbf6)
 
 The contents of each jupyter notebook and folder is explained below:
 
