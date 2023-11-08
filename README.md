@@ -65,7 +65,11 @@ The automated workflow can be found in the protein_prep/run_files where Commands
 
    [The folder has its own readme with more detailed information](https://github.com/kamerlinlab/tools-project/tree/main/comparative_data#readme)
 
+## How to use KIN
+   We formulated a set of Jupyter notebooks that provide examples of KIN application and follow-up analysis.
 
+   [**shared_network.ipynb**](https://github.com/kamerlinlab/KIN/blob/main/contact_analysis/shared_network.ipynb) - Example workflow for the formation of the conserved interaction network, missing interaction network from both MD and crystal structure data. It also contains some visual techniques to compare the performance of the two.
+   
 ## License and Disclaimer
 
 This software is published under a GNU General Public License v2.0.
