@@ -23,9 +23,9 @@ def common_network(
     path_input: str,
     target_structure: str,
     network_index="pdb",
+    conservation_uniform=True,
     missing_network=False,
     no_vdw=True,
-    only_sc=False,
 ) -> tuple[dict, dict, pd.DataFrame, dict, dict, pd.DataFrame]:
     """The outermost function that takes in a path to all csv
     files with contacts after msa reindexing was performed.
@@ -57,8 +57,8 @@ def common_network(
         df = pd.read_csv(file_path)
         if no_vdw is True:
             df = df[df["Interaction_Type"] != "vdw"]
-        if only_sc is True:
-            df = df[df["Residue_Parts"] != "mc-mc"]
+        # if only_sc is True:
+        #     df = df[df["Residue_Parts"] != "mc-mc"]
 
         all_interactions_dfs[system_name] = df
         res1_msa_list = list(df["Res1_msa"])
@@ -94,8 +94,8 @@ def common_network(
         target_msa_pdb,
         target_structure,
         network_index,
+        conservation_uniform,
         no_vdw,
-        only_sc,
     )
     if missing_network:
         (
@@ -129,8 +129,7 @@ def conservation_nextwork_dict(
     target_msa_pdb_dict: dict,
     target_structure: str,
     index_type: str,
-    exclude_vdw=True,
-    only_sc=False,
+    conservation_uniform=True,
 ) -> tuple[dict, dict, pd.DataFrame]:
     """Takes in all the contacts in the form of a dictionary, compares it to the structure of the
     target to make sure that the contacts that are not present are not due to the missing residues,
@@ -165,13 +164,6 @@ def conservation_nextwork_dict(
         target_res1 = target_contacts[0]
         target_res2 = target_contacts[1]
         target_int_type = target_properties[0]
-        # if exclude_vdw is True and target_int_type == "vdw":
-        #    continue
-        # if only_sc is True:
-        #   target_int_location = target_properties[1]
-        #  target_loc_1, target_loc_2 = target_int_location.split("-")
-        #   if target_loc_1 != "sc" or target_loc_2 != "sc":
-        #       continue
         contact_int_type_list = []
         contact_loc_list = []
 
@@ -185,15 +177,6 @@ def conservation_nextwork_dict(
 
                 if (target_res1, target_res2) in contact_dict:
                     properties = contact_dict[(target_res1, target_res2)]
-                    # if exclude_vdw is True:
-                    # int_type = properties[0]
-                    # if int_type == "vdw":
-                    #     continue
-                    # if only_sc is True:
-                    #   int_location = properties[1]
-                    #  loc_1, loc_2 = int_location.split("-")
-                    # if loc_1 != "sc" or loc_2 != "sc":
-                    #    continue
                     contact_yes += 1
                     contact_int_type_list.append(properties[0])
                     contact_loc_list.append(properties[1])
@@ -203,29 +186,12 @@ def conservation_nextwork_dict(
                     target_res1,
                 ) in contact_dict:
                     properties = contact_dict[(target_res2, target_res1)]
-                    #  if exclude_vdw is True:
-                    #      int_type = properties[0]
-                    #      if int_type == "vdw":
-                    #          continue
-                    #  if only_sc is True:
-                    #      int_location = properties[1]
-                    #      loc_1, loc_2 = int_location.split("-")
-                    #      if loc_1 != "sc" or loc_2 != "sc":
-                    #          continue
                     contact_yes += 1
                     contact_int_type_list.append(properties[0])
                     contact_loc_list.append(properties[1])
 
                 else:
                     contact_no += 1
-        # if exclude_vdw is True:
-        # if target_int_type == "vdw":
-        #     continue
-        # if only_sc is True:
-        #    target_int_location = target_properties[1]
-        #    target_loc_1, target_loc_2 = target_int_location.split("-")
-        # if target_loc_1 != "sc" or target_loc_2 != "sc":
-        #        continue
         if len(contact_int_type_list) != 0 and len(contact_loc_list) != 0:
             contact_int_type_count = Counter(contact_int_type_list)
             contact_loc_count = Counter(contact_loc_list)
@@ -245,9 +211,14 @@ def conservation_nextwork_dict(
         contact_pdb = (int(contact_pdb[0][3:]), int(contact_pdb[1][3:]))
         Res1_pdb_list.append(contact_pdb[0])
         Res2_pdb_list.append(contact_pdb[1])
-        conservation[(target_res1, target_res2)] = contact_yes / (
-            contact_dna + contact_no + contact_yes
-        )
+        if conservation_uniform == True:
+            conservation[(target_res1, target_res2)] = contact_yes / (
+                contact_dna + contact_no + contact_yes
+            )
+        else:
+            conservation[(target_res1, target_res2)] = contact_yes / (
+                contact_no + contact_yes
+            )
         conservation_list.append(conservation[(target_res1, target_res2)])
 
         conservation_int_type[(target_res1, target_res2)] = colors[target_int_type]
@@ -322,8 +293,8 @@ def conservation_nextwork_df(
     target_msa_pdb_dict: dict,
     target_structure: str,
     index_type: str,
+    conservation_uniform=True,
     exclude_vdw=True,
-    only_sc=False,
 ) -> dict:
     """Takes in all the contacts in the form of a data framework,
     the workflow is analagous to the function above but 5 times slower.
@@ -371,9 +342,15 @@ def conservation_nextwork_df(
                     contact_yes += 1
                 else:
                     contact_no += 1
-        conservation[(target_res1_msa, target_res2_msa)] = contact_yes / (
-            contact_dna + contact_no + contact_yes
-        )
+        if conservation_uniform == True:
+            conservation[(target_res1_msa, target_res2_msa)] = contact_yes / (
+                contact_dna + contact_no + contact_yes
+            )
+        else:
+            conservation[(target_res1_msa, target_res2_msa)] = contact_yes / (
+                contact_no + contact_yes
+            )
+
     if index_type == "msa":
         dir_out = conservation
     elif index_type == "pdb":
@@ -518,6 +495,59 @@ def make_grid(data, total_res_number):
     return grid
 
 
+def filter_network(
+    network,
+    colors,
+    properties,
+    network_index="pdb",
+    int_strength=0.0,
+    no_main_chain=False,
+    int_exclude=None,
+):
+    new_network = {}
+    new_network_colors = {}
+    for key, value in network.items():
+        if network_index == "pdb":
+            mask_1 = (properties["Res1_pdb"] == key[0]) & (
+                properties["Res2_pdb"] == key[1]
+            )
+            mask_2 = (properties["Res1_pdb"] == key[1]) & (
+                properties["Res2_pdb"] == key[0]
+            )
+        elif network_index == "msa":
+            mask_1 = (properties["Res1_msa"] == key[0]) & (
+                properties["Res2_msa"] == key[1]
+            )
+            mask_2 = (properties["Res1_msa"] == key[1]) & (
+                properties["Res2_msa"] == key[0]
+            )
+        else:
+            print("ERROR: Incorrect indexing type is specified for the network")
+            print("-----------------------------------------------------------")
+            return None
+
+        if value > int_strength:
+            if no_main_chain:
+                location_1 = properties.loc[mask_1, "struc_location"]
+                location_2 = properties.loc[mask_2, "struc_location"]
+                locs = [location_1, location_2]
+                for loc in locs:
+                    if loc == "mc-mc":
+                        continue
+            if int_exclude is not None:
+                for interaction in int_exclude:
+                    if (
+                        interaction in properties.loc[mask_1, "struc_int_type"].values
+                        or interaction
+                        in properties.loc[mask_2, "struc_int_type"].values
+                    ):
+                        continue
+            new_network[key] = value
+            new_network_colors[key] = colors[key]
+
+    return new_network, new_network_colors
+
+
 def difference_matrix(
     static_network,
     static_colors,
@@ -629,6 +659,26 @@ def plot_hist_of_contacts(contact, title, filename, color_choice="blue"):
     plt.grid(axis="y", linestyle="--", alpha=0.9)
     plt.show()
     # plt.savefig(filename)
+
+
+def per_res_score(
+    conservation_dict,
+):
+    per_res_score = {}
+    for key, value in conservation_dict.items():
+        if key[0] in per_res_score.keys():
+            per_res_score[key[0]] += value
+        else:
+            per_res_score[key[0]] = value
+        if key[1] in per_res_score.keys():
+            per_res_score[key[1]] += value
+        else:
+            per_res_score[key[1]] = value
+    max_score = max(per_res_score.values())
+    min_score = min(per_res_score.values())
+    for key, value in per_res_score.items():
+        per_res_score[key] = (per_res_score[key] - min_score) / (max_score - min_score)
+    return per_res_score
 
 
 def plot_per_res_score(
