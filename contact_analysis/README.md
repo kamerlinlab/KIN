@@ -9,3 +9,6 @@ This folder contains examples for obtaining contacts from crystal structures and
 **Static_contacts_processing:** shared and missing interaction networks from crystal structure contacts.
 
 **Dynamic_contacts_processing:** shared and missing interaction network from MD trajectories.
+
+### Jupyter notebooks:
+shared_network.ipynb - Example workflow for the formation of the conserved interaction network, missing interaction network from both MD and crystal structure data. It also contains some visual techniques to compare the performance of the two.
