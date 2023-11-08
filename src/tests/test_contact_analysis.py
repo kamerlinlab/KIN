@@ -29,7 +29,9 @@ from kin.contacts.contact_analysis import multi_frame_contact_analysis
 
 # location of data.
 CONTACTS_FILE_LOCATION = Path(contact_analysis.__file__)
-TEST_DATA_DIR = CONTACTS_FILE_LOCATION.parents[2] / "tests" / "data"
+TEST_DATA_DIR = (
+    CONTACTS_FILE_LOCATION.parents[2] / "tests" / "data" / "contact_calculation_files"
+)
 
 
 TEST_FILES = {

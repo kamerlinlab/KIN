@@ -9,7 +9,9 @@ from kin.utils import per_residue_distance_to_site, normalise_dict_values
 
 # location of data.
 CONTACTS_FILE_LOCATION = Path(contact_analysis.__file__)
-TEST_DATA_DIR = CONTACTS_FILE_LOCATION.parents[2] / "tests" / "data"
+TEST_DATA_DIR = (
+    CONTACTS_FILE_LOCATION.parents[2] / "tests" / "data" / "contact_calculation_files"
+)
 TEST_FILES = {
     "single_pdb": "4YFM_MAB-1_apo.pdb",
     "single_pdb_with_water": "4YFM_MAB-1_apo_water.pdb",
