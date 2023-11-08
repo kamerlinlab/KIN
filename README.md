@@ -32,7 +32,7 @@ python setup.py install
 ## How to use KIN
    We formulated a set of Jupyter notebooks that provide examples of KIN application and follow-up analysis.
 
-   [**shared_network.ipynb**](https://github.com/kamerlinlab/KIN/blob/main/contact_analysis/shared_network.ipynb) - Example workflow for the formation of the conserved interaction network, missing interaction network from both MD and crystal structure data. It also contains some visual techniques to compare the performance of the two.
+   [**shared_network.ipynb**](https://github.com/kamerlinlab/KIN/blob/main/contact_analysis/shared_network.ipynb) - Example workflow for the formation of the conserved interaction network, missing interaction network from both MD and crystal structure data.
    
 ## The repository is broken up into several subfolders for different sections of the project:
 
