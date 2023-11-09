@@ -3,9 +3,7 @@ and outputs a network of contacts shared among all the structures
 along with their conservation scores. """
 
 import glob
-from math import e
 import os
-from re import I
 import time
 import csv
 import ast
@@ -15,9 +13,11 @@ import numpy as np
 from collections import Counter
 import matplotlib.pyplot as plt
 from pyparsing import col
+from kin.msa_indexing import parse_fasta
 
 
 def common_network(
+    path_msa_alignment: str,
     path_input: str,
     target_structure: str,
     network_index="pdb",
@@ -33,8 +33,17 @@ def common_network(
     (indexing type can be changed between msa and pdb of projected structure);
     second dictionary contains analogous contacts and matching colors that describe interaction type.
     """
-    print(path_input)
-    print(target_structure)
+    print("Target structure is:", target_structure)
+    target_sequence = parse_fasta(path_msa_alignment)[target_structure]
+    full_msa_pdb_index = {}
+    counter = 0
+    for i, res in enumerate(target_sequence):
+        if res != "-":
+            counter += 1
+            full_msa_pdb_index[i + 1] = int(counter)
+        else:
+            full_msa_pdb_index[i + 1] = None
+
     intputs = path_input + "/*.csv"
     msa_df_files = glob.glob(intputs)
 
@@ -102,7 +111,10 @@ def common_network(
         ) = missing_contacts_dict(
             all_interactions_dict,
             target_structure,
+            full_msa_pdb_index,
+            missing_res_dict,
             structure_count,
+            network_index,
         )
     else:
         missing_contacts = {}
@@ -197,7 +209,6 @@ def conservation_nextwork_dict(
         else:
             common_int_type_list.append("None")
             common_loc_list.append("None")
-            print("no contact for this residue pair")
         Res1_msa_list.append(target_res1)
         Res2_msa_list.append(target_res2)
         structure_int_type_list.append(target_int_type)
@@ -226,11 +237,11 @@ def conservation_nextwork_dict(
                 "Res2_msa": Res2_msa_list,
                 "Res1_pdb": Res1_pdb_list,
                 "Res2_pdb": Res2_pdb_list,
-                "struc_int_type": structure_int_type_list,
-                "struc_loc": structure_loc_list,
-                "common_int_type": common_int_type_list,
-                "common_loc": common_loc_list,
-                "conservation": conservation_list,
+                "Int_Type": structure_int_type_list,
+                "Location": structure_loc_list,
+                "Conservation": conservation_list,
+                "Common_Int_Type": common_int_type_list,
+                "Common_Loc": common_loc_list,
             }
         )
 
@@ -250,11 +261,11 @@ def conservation_nextwork_dict(
                 "Res2_msa": Res2_msa_list,
                 "Res1_pdb": Res1_pdb_list,
                 "Res2_pdb": Res2_pdb_list,
-                "struc_int_type": structure_int_type_list,
-                "struc_loc": structure_loc_list,
-                "common_int_type": common_int_type_list,
-                "common_loc": common_loc_list,
-                "conservation": conservation_list,
+                "Int_Type": structure_int_type_list,
+                "Conservation": conservation_list,
+                "Location": structure_loc_list,
+                "Common_Int_Type": common_int_type_list,
+                "Common_Loc": common_loc_list,
             }
         )
 
@@ -376,7 +387,10 @@ def conservation_nextwork_df(
 def missing_contacts_dict(
     all_interactions_dict: dict,
     target_structure: str,
+    target_msa_pdb_dict: dict,
+    missing_res_dict: dict,
     structure_count: int,
+    network_index="pdb",
 ) -> tuple[dict, dict, pd.DataFrame]:
     colors = {}
     colors["hbond"] = "br1"
@@ -388,17 +402,24 @@ def missing_contacts_dict(
     missing_contacts_count = {}
     missing_contacts_properties = pd.DataFrame(
         columns=(
-            "Contact",
-            "Count",
-            "Interaction_Type",
-            "Int_Type_Count",
+            "Res1_msa",
+            "Res2_pdb",
+            "Res1_pdb",
+            "Res2_pdb",
+            "conservation",
+            "Int_Type",
+            "Int_Type_Percent",
             "Location",
-            "Location_Count",
+            "Location_percent",
         )
     )
     missing_contacts = {}
     missing_contacts_colors = {}
     target_contacts_dict = all_interactions_dict[target_structure]
+    missing_residues = []
+    for msa, pdb in target_msa_pdb_dict.items():
+        if pdb == None:
+            missing_residues.append(msa)
     for structure, contact_dict in all_interactions_dict.items():
         if structure != target_structure:
             for contact, _ in contact_dict.items():
@@ -406,6 +427,8 @@ def missing_contacts_dict(
                     contact[1],
                     contact[0],
                 ) not in target_contacts_dict:
+                    if contact[0] in missing_residues or contact[1] in missing_residues:
+                        continue
                     if contact not in missing_contacts_count:
                         missing_contacts_count[contact] = 1
                     else:
@@ -415,6 +438,10 @@ def missing_contacts_dict(
     int_type_count_list = []
     location_list = []
     location_count_list = []
+    res1_pdb = []
+    res2_pdb = []
+    res1_msa = []
+    res2_msa = []
     for contact, value in missing_contacts_count.items():
         int_type = []
         location = []
@@ -432,20 +459,39 @@ def missing_contacts_dict(
         count_location = location_count.most_common(1)[0][1]
 
         counter += 1
-        missing_contacts[contact] = value / structure_count
-        missing_contacts_colors[contact] = colors[common_int_type]
+        contact_pdb_1 = target_msa_pdb_dict[contact[0]]
+        contact_pdb_2 = target_msa_pdb_dict[contact[1]]
+        if contact_pdb_1 == None or contact_pdb_2 == None:
+            print("ERROR, MISSING INTERACTION OCCURS AT THE MISSING RESIDUE")
+            return None
+        contact_pdb = (contact_pdb_1, contact_pdb_2)
+        res1_msa.append(contact[0])
+        res2_msa.append(contact[1])
+        res1_pdb.append(contact_pdb[0])
+        res2_pdb.append(contact_pdb[1])
+
+        if network_index == "pdb":
+            missing_contacts[contact_pdb] = value / structure_count
+            missing_contacts_colors[contact_pdb] = colors[common_int_type]
+        else:
+            missing_contacts[contact] = value / structure_count
+            missing_contacts_colors[contact] = colors[common_int_type]
+
         int_type_list.append(common_int_type)
-        int_type_count_list.append(count_int_type / len(int_type))
+        int_type_count_list.append(100 * (count_int_type / len(int_type)))
         location_list.append(common_location)
-        location_count_list.append(count_location / len(location))
+        location_count_list.append(100 * (count_location / len(location)))
 
-    missing_contacts_properties["Contact"] = missing_contacts.keys()
-    missing_contacts_properties["Count"] = missing_contacts.values()
-    missing_contacts_properties["Interaction_Type"] = int_type_list
-    missing_contacts_properties["Int_Type_Count"] = int_type_count_list
+    missing_contacts_properties["Res1_msa"] = res1_msa
+    missing_contacts_properties["Res2_msa"] = res2_msa
+    missing_contacts_properties["Res1_pdb"] = res1_pdb
+    missing_contacts_properties["Res2_pdb"] = res2_pdb
+    missing_contacts_properties["Concervation"] = missing_contacts.values()
+    missing_contacts_properties["Int_Type"] = int_type_list
+    missing_contacts_properties["Int_Percent"] = int_type_count_list
     missing_contacts_properties["Location"] = location_list
-    missing_contacts_properties["Location_Count"] = location_count_list
-
+    missing_contacts_properties["Location_Percent"] = location_count_list
+    print("Number of missing contacts:", len(missing_contacts))
     return missing_contacts, missing_contacts_colors, missing_contacts_properties
 
 
@@ -481,11 +527,12 @@ def filter_network(
     properties,
     min_score=0.0,
     network_index="pdb",
-    no_main_chain=False,
+    loc_exclude=None,
     int_exclude=None,
 ):
     new_network = {}
     new_network_colors = {}
+    combined_mask = pd.Series(False, index=properties.index)
     for key, value in network.items():
         if network_index == "pdb":
             mask_1 = (properties["Res1_pdb"] == key[0]) & (
@@ -504,28 +551,36 @@ def filter_network(
         else:
             print("ERROR: Incorrect indexing type is specified for the network")
             print("-----------------------------------------------------------")
-            return None
-
+            return None, None, None
+        mask_12 = mask_1 | mask_2
         if value > min_score:
-            if no_main_chain:
-                location_1 = properties.loc[mask_1, "struc_location"]
-                location_2 = properties.loc[mask_2, "struc_location"]
-                locs = [location_1, location_2]
-                for loc in locs:
-                    if loc == "mc-mc":
+            if loc_exclude is not None:
+                location = properties.loc[mask_12, "Location"]
+                if len(location) == 1:
+                    if location.item() in loc_exclude:
                         continue
+                elif len(location) != 0:
+                    print(location)
+                    print(len(location))
+            # location_1 = properties.loc[mask_1, "Location"]
+            # location_2 = properties.loc[mask_2, "Location"]
+            # locs = [location_1, location_2]
+            # for loc in locs:
+            #     if len(loc) == 1:
+            #         if loc.item() in loc_exclude:
+            #             continue
             if int_exclude is not None:
                 for interaction in int_exclude:
                     if (
-                        interaction in properties.loc[mask_1, "struc_int_type"].values
-                        or interaction
-                        in properties.loc[mask_2, "struc_int_type"].values
+                        interaction in properties.loc[mask_1, "Int_Type"].values
+                        or interaction in properties.loc[mask_2, "Int_Type"].values
                     ):
                         continue
             new_network[key] = value
             new_network_colors[key] = colors[key]
-
-    return new_network, new_network_colors
+            combined_mask = combined_mask | mask_12
+    new_properties = properties[combined_mask]
+    return new_network, new_network_colors, new_properties
 
 
 def difference_matrix(
@@ -641,24 +696,26 @@ def plot_hist_of_contacts(contact, title, filename, color_choice="blue"):
     # plt.savefig(filename)
 
 
-def per_res_score(
+def get_per_res_score(
     conservation_dict,
 ):
-    per_res_score = {}
+    per_res_score_dict = {}
     for key, value in conservation_dict.items():
-        if key[0] in per_res_score.keys():
-            per_res_score[key[0]] += value
+        if key[0] in per_res_score_dict.keys():
+            per_res_score_dict[key[0]] += value
         else:
-            per_res_score[key[0]] = value
-        if key[1] in per_res_score.keys():
-            per_res_score[key[1]] += value
+            per_res_score_dict[key[0]] = value
+        if key[1] in per_res_score_dict.keys():
+            per_res_score_dict[key[1]] += value
         else:
-            per_res_score[key[1]] = value
-    max_score = max(per_res_score.values())
-    min_score = min(per_res_score.values())
-    for key, value in per_res_score.items():
-        per_res_score[key] = (per_res_score[key] - min_score) / (max_score - min_score)
-    return per_res_score
+            per_res_score_dict[key[1]] = value
+    max_score = max(per_res_score_dict.values())
+    min_score = min(per_res_score_dict.values())
+    for key, value in per_res_score_dict.items():
+        per_res_score_dict[key] = (per_res_score_dict[key] - min_score) / (
+            max_score - min_score
+        )
+    return per_res_score_dict
 
 
 def plot_per_res_score(
