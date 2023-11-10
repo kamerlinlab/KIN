@@ -646,7 +646,7 @@ def plot_int_map(grid, title, color="Reds", threshold=0.1):
     x_coords, y_coords = np.meshgrid(np.arange(grid.shape[0]), np.arange(grid.shape[1]))
     x_coords = x_coords.flatten()
     y_coords = y_coords.flatten()
-    plt.rcParams["font.size"] = 20
+    # plt.rcParams["font.size"] = 20
     cmap = plt.cm.Reds
     fig, ax = plt.subplots()
     above_threshold_points = []
@@ -680,7 +680,7 @@ def plot_int_map(grid, title, color="Reds", threshold=0.1):
     plt.show()
 
 
-def plot_hist_of_contacts(contact, title, filename, color_choice="blue"):
+def plot_hist_of_contacts(contact, title, color_choice="blue"):
     contact_score_list = []
     for key, value in contact.items():
         contact_score_list.append(value)
