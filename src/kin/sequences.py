@@ -54,6 +54,5 @@ def seq_align_file_to_sequences(
                     current_seq += prot_seq_part
 
         # catches the final sequence (as now hit EOF)
-        seq_alignments[current_protein] = current_seq
-
+        seq_alignments[current_protein] = list(current_seq)
     return seq_alignments
