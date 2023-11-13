@@ -225,7 +225,10 @@ def find_possible_single_point_mutations(
 
 
 def find_possible_double_mutations(
-    contact_combinations, target_res_pair: tuple[int, int], target_prot_seq
+    contact_combinations,
+    target_res_pair: tuple[int, int],
+    target_prot_seq: list[str],
+    conservation_cutoff: int = 3,
 ) -> list[dict]:
     """
     Given a dictionary of residue pairs in contact, find all possible double mutations
@@ -269,7 +272,7 @@ def find_possible_double_mutations(
         # only looking for double mutants.
         if (res1_aa == target_res1_aa) or (res2_aa == target_res2_aa):
             continue
-        if conservation < 3:
+        if conservation < conservation_cutoff:
             continue  # only test those with 3 or more observations.
 
         # add the double mutation info
