@@ -39,7 +39,6 @@ def indexing_pdb_to_msa(
     pdb contact analysis output, updates original dataframe with the new
     columns that contain msa indexing and returns it
 
-    TODO: flip the order such that msa indexing are first and second columns
     """
 
     res1_list = list(df_input["Res1"])
@@ -144,7 +143,6 @@ def parse_contact_output(
     X percent of simluation time it counts as 1,
     otherwhile it is not preserved enough and counts as 0.
 
-    TODO: repace forloop with a df function if slow
     """
 
     if contact_type == "md":

@@ -29,7 +29,20 @@ pip install key-interactions-network
 cd KIN-main
 python setup.py install
 ```
+## How to use KIN
+   We are working on a set of Jupyter notebooks that provide easy-to-follow examples of KIN application and follow-up analysis.
 
+   1. [**shared_network.ipynb**](https://github.com/kamerlinlab/KIN/blob/main/contact_analysis/shared_network.ipynb) - Example workflow for the formation of the conserved interaction network, missing interaction network from both MD and crystal structure data.
+
+   2. [**alternate_contacts_analysis.ipynb**](https://github.com/kamerlinlab/KIN/blob/main/comparative_data/alternate_contacts_analysis.ipynb) - This notebook looks at possible alternative contacts that could be formed given a target protein (as suggested by our approach). We also compared all possible single point mutations suggested by our approach to two alternative selection methods.
+
+ 3. [**network_similarity.ipynb**](https://github.com/kamerlinlab/KIN/blob/main/comparative_data/network_similarity.ipynb) - Measure the similarity of each network and compare the networks made to sequence based data. Hierarchical clustering is then applied to the contact similarity matrix to create a dendrogram based on protein contacts.
+
+
+4. [**analyse_dendrograms.ipynb**](https://github.com/kamerlinlab/KIN/blob/main/comparative_data/analyse_dendrograms.ipynb) - This is a follow up to the analysis performed in the notebook called "network_similarity.ipynb". In that notebook, hierarchal clustering was performed, and in this one we analyse what differences in the contacts were behind the splitting(s).
+
+   
+   
 ## The repository is broken up into several subfolders for different sections of the project:
 
 #### 1. src
@@ -65,7 +78,7 @@ The automated workflow can be found in the protein_prep/run_files where Commands
 
    [The folder has its own readme with more detailed information](https://github.com/kamerlinlab/tools-project/tree/main/comparative_data#readme)
 
-
+   
 ## License and Disclaimer
 
 This software is published under a GNU General Public License v2.0.
