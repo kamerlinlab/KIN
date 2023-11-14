@@ -146,3 +146,7 @@ contact_analysis/*pml
 contact_analysis/*pse
 
 comparitive_data/comparison_results/*
+
+# tutorial results folders
+contact_analysis/dynamic_contacts_processing/*
+contact_analysis/static_contacts_processing/*
